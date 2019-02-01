@@ -36,10 +36,9 @@
 #include "Utilities.hpp"
 #include "Shader.hpp"
 #include "TriangleSoup.hpp"
+#include "Ball.hpp"
 
 //Declarations
-
-
 
 
 /*
@@ -52,14 +51,21 @@ int main(int argc, char *argv[]) {
 	int width, height;
     Shader myShader;
     GLfloat T[16];
+    GLfloat T2[16];
     GLint location_T;
     float time;
     GLint location_time;
     TriangleSoup myShape;
 
-    //Matrices
-    Utilities::mat4identity(T);
-    Utilities::mat4print(T);
+    Ball myBall = Ball(0.0, 0.0, 1.0, 6.0, 0.0, 0.0);
+
+
+    //Constant Matrices (Not animated)
+    /*Utilities::mat4translate(T, cos(time), 0.0, 0.0);
+    Utilities::mat4rotz(T2, time);
+
+    Utilities::mat4mult(T, T2, T);*/
+    //Utilities::mat4print(T);
 
     const GLFWvidmode *vidmode;  // GLFW struct to hold information about the display
 	GLFWwindow *window;    // GLFW struct to hold information about the window
@@ -93,7 +99,7 @@ int main(int argc, char *argv[]) {
     Utilities::loadExtensions();
 
     //Create objects here
-    myShape.createSphere(0.5f, 32);
+    myShape.createSphere(0.5f, 6);
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
@@ -134,6 +140,14 @@ int main(int argc, char *argv[]) {
         time = (float)glfwGetTime();    //Number of seconds since program started
         glUseProgram(myShader.programID);   //Activate the shader to set its variable
         glUniform1f(location_time, time); //Copy value to shader
+
+        //Animated Matrices
+        Utilities::mat4translate(T, cos(time), 0.0, 0.0);
+        Utilities::mat4rotz(T2, time);
+
+        Utilities::mat4mult(T, T2, T);
+
+        //Animated matrices
         glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
 
         myShape.render();
