@@ -16,6 +16,7 @@
 #endif
 
 #include <GLFW/glfw3.h>
+#include "Ball.hpp"
 
 #include <cstdio>  // For console messages
 #include <cmath>
@@ -99,6 +100,8 @@ void loadExtensions();
  * windows. Call it only for one window, and only once for each frame.
  */
 double displayFPS(GLFWwindow *window);
+
+bool Collide(Ball B1, Ball B2);
 
 }
 

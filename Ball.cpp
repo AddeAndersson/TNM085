@@ -31,6 +31,20 @@ float Ball::getVelY() {
     return vel_y;
 }
 
+float Ball::getPosX(){
+    return pos_x;
+}
+
+float Ball::getPosY(){
+    return pos_y;
+}
+
+void Ball::updateVel(float newVelx, float newVely){
+
+    vel_x = newVelx;
+    vel_y = newVely;
+}
+
 //Returns an array with x- and y-direction koefficients
 //time is the time passed since collision
 float *Ball::getFriction(float time) {

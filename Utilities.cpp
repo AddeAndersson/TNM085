@@ -16,6 +16,7 @@
  */
 
 #include "Utilities.hpp"
+#include <math.h>
 
 #ifdef __WIN32__
 /* Global function pointers for everything we need beyond OpenGL 1.1 */
@@ -266,4 +267,11 @@ double Utilities::displayFPS(GLFWwindow *window) {
     }
     frames ++;
     return fps;
+}
+
+bool Utilities::Collide(Ball B1, Ball B2){
+
+    float radius = 0.0286;
+    if(sqrt(pow(B1.getPosX() - B2.getPosX(), 2) + pow(B1.getPosY() - B2.getPosY(),2)) <= 2*radius) return true;
+    else return false;
 }

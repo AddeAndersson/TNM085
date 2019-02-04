@@ -36,7 +36,6 @@
 #include "Utilities.hpp"
 #include "Shader.hpp"
 #include "TriangleSoup.hpp"
-#include "Ball.hpp"
 
 //Declarations
 

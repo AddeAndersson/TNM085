@@ -1,6 +1,6 @@
 function [u] = fkoeff(v0,t)
 
-%Funktionen tar in vO och tiden, den returnerar friktionskoefficienten fÃ¶r
+%Funktionen tar in vO och tiden, den returnerar friktionskoefficienten för
 %den aktuella tidpunkten.
 
 ur = 0.01;

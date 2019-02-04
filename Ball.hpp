@@ -27,5 +27,8 @@ class Ball {
         float *getDirection();
         float getVelX();
         float getVelY();
+        float getPosX();
+        float getPosY();
         void printVel();
+        void updateVel(float newVelx, float newVely);
 };

@@ -1,17 +1,27 @@
 
 
+% k = 0.014;
+% allPos = [0.5325, 1.5975-2*k, 1.6470-k, 1.6470-k, 1.6965, 1.6965, 1.6965, 1.7460+k ,1.7460+k ,1.7460+k ,1.7460+k, 1.7955+2*k , 1.7955+2*k, 1.7955+2*k, 1.7955+2*k, 1.7955+2*k;
+%        0.5325, 0.5325, 0.5039-k, 0.5611+k, 0.4753-k, 0.5325, 0.5897+k, 0.4467-2*k, 0.5039-k, 0.5611+k, 0.6183+2*k,0.4181-2*k, 0.4753-k, 0.532, 0.5897+k, 0.6469+2*k];
+
+
 % Array with ball positions
 % row 1 is x-coordinates and row 2 is y coordinates
 allPos = [0.5325, 1.5975, 1.6470, 1.6470, 1.6965, 1.6965 1.6965, 1.7460 ,1.7460 ,1.7460 ,1.7460, 1.7955 , 1.7955, 1.7955, 1.7955, 1.7955;
        0.5325, 0.5325, 0.5039, 0.5611, 0.4753, 0.5325, 0.5897, 0.4467, 0.5039, 0.5611, 0.6183,0.4181, 0.4753, 0.532, 0.5897, 0.6469];
 
-% row 1 is x-velocity and row 2 is y-velocity   
+% row 1 is x-velocity and row 2 is y-velocity  
 allVel = zeros(2,16);
-allVel(1,1) = 0.001;
+allVel(1,1) = 9;
+allVel(2,1) = 0.1;
+
+%Time
+dt = 0.001;
 
 %General properties of the balls
 m=0.165;
 r=0.0286;
+%r=0.028;
 
 % Background
 patch([0,0,2.13,2.13],[0,1.065,1.065,0],'g','FaceAlpha',0.5);
@@ -43,11 +53,12 @@ for i=1:16
 end
 
 
-% Motion engin
-for i = 1: 0.01 : 5000
+
+% Motion engine
+for i = 1:0.01:5000
     
     % Update position
-    allPos = allPos+allVel;
+    allPos = allPos+allVel*dt;
 
     % Check for collision with playground boarder
     for n = 1:16
@@ -72,8 +83,15 @@ for i = 1: 0.01 : 5000
             pos2 = [allPos(1,n), allPos(2,n)];
             vel2 = [allVel(1,n), allVel(2,n)];
             
-            [v1Out, v2Out] = ballCollision(pos1,pos2,vel1,vel2);
+            [v1Out, v2Out, pos1Out, pos2Out] = ballCollision(pos1,pos2,vel1,vel2, r);
             
+            % new positions for the balls
+            allPos(1,m) = pos1Out(1);
+            allPos(2,m) = pos1Out(2);
+            allPos(1,n) = pos2Out(1);
+            allPos(2,n) = pos2Out(2);
+            
+            %new velocity for the balls
             allVel(1,m) = v1Out(1);
             allVel(2,m) = v1Out(2);
             
