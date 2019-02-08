@@ -1,5 +1,6 @@
 #include "Rotator.hpp"
 
+/*
 void KeyRotator::init(GLFWwindow *window) {
      phi = 0.0;
      theta = 0.0;
@@ -35,7 +36,47 @@ void KeyRotator::poll(GLFWwindow *window) {
 		if (theta < -M_PI/2.0) theta = -M_PI/2.0;      // Clamp at -90
 	}
 }
+*/
+void KeyTranslator::init(GLFWwindow *window) {
+     tran_x = 0.0;
+     tran_y = 0.0;
+     tran_z = 0.0;
+     lastTime = glfwGetTime();
+}
 
+void KeyTranslator::poll(GLFWwindow *window) {
+
+	double currentTime, elapsedTime;
+	double sensitivity = 2.0;
+
+	currentTime = glfwGetTime();
+	elapsedTime = currentTime - lastTime;
+	lastTime = currentTime;
+
+	if(glfwGetKey(window, GLFW_KEY_RIGHT)) {
+		tran_x -= elapsedTime*sensitivity; // Translate right
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_LEFT)) {
+		tran_x += elapsedTime*sensitivity; // Translate left
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_UP)) {
+		tran_z += elapsedTime*sensitivity; // Translate forward
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_DOWN)) {
+		tran_z -= elapsedTime*sensitivity; // Translate backward
+	}
+
+    if(glfwGetKey(window, GLFW_KEY_SPACE)) {
+		tran_y += elapsedTime*sensitivity; // Translate up
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_C)) {
+		tran_y -= elapsedTime*sensitivity; // Translate down
+	}
+}
 
 void MouseRotator::init(GLFWwindow *window) {
     phi = 0.0;

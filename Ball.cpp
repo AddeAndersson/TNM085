@@ -1,4 +1,5 @@
 #include "Ball.hpp"
+
 //
 
 Ball::Ball(float in_v0_x, float in_v0_y, float in_vel_x, float in_vel_y, float in_pos_x, float in_pos_y)
@@ -40,7 +41,6 @@ float Ball::getPosY(){
 }
 
 void Ball::updateVel(float newVelx, float newVely){
-
     vel_x = newVelx;
     vel_y = newVely;
 }

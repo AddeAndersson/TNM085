@@ -11,7 +11,7 @@
 //vec3 ks is the specular surface reflection color
 //vec3 Is is the specular illumination color
 
-uniform float time;
+//uniform float time;
 
 in vec3 N;
 
@@ -28,7 +28,7 @@ void main() {
     
     float n = 5;
 
-    vec3 V = normalize(vec3(0.0, 0.0, 1.0));
+    vec3 V = normalize(vec3(0.0, 0.0, -3.0));
     vec3 L = normalize(vec3(1.0, 1.0, 1.0));
 
     vec3 R = 2.0*dot(N,L)*N - L;

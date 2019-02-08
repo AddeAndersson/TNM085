@@ -1,4 +1,5 @@
 #include "TriangleSoup.hpp"
+glm::vec2 *getStartPos(glm::vec2 startPositions[]);
 
 /* Constructor: initialize a TriangleSoup object to all zeros */
 TriangleSoup::TriangleSoup() {
@@ -15,7 +16,7 @@ TriangleSoup::TriangleSoup() {
 /* Destructor: clean up allocated data in a TriangleSoup object */
 TriangleSoup::~TriangleSoup() {
     clean();
-};
+}
 
 
 void TriangleSoup::clean() {
@@ -122,7 +123,7 @@ void TriangleSoup::createTriangle() {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
  	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-};
+}
 
 
 /* Create a simple box geometry */
@@ -212,7 +213,7 @@ void TriangleSoup::createBox(float xsize, float ysize, float zsize) {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
  	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-};
+}
 
 
 /*
@@ -231,6 +232,8 @@ void TriangleSoup::createBox(float xsize, float ysize, float zsize) {
  * Author: Stefan Gustavson (stegu@itn.liu.se) 2014.
  * This code is in the public domain.
  */
+
+ //Make instances
 void TriangleSoup::createSphere(float radius, int segments) {
 
 	int i, j, base, i0;
@@ -238,6 +241,9 @@ void TriangleSoup::createSphere(float radius, int segments) {
 	double theta, phi;
 	int vsegs, hsegs;
 	int stride = 8;
+	glm::vec2 startPositions[16];
+
+	getStartPos(startPositions);
 
 	// Delete any previous content in the TriangleSoup object
 	clean();
@@ -324,6 +330,14 @@ void TriangleSoup::createSphere(float radius, int segments) {
 		indexarray[base+3*i+2] = nverts-3-i;
 	}
 
+    /*Store INSTANCE DATA*/
+    unsigned int instanceVBO;
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 16, &startPositions[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
 	// Generate one vertex array object (VAO) and bind it
 	glGenVertexArrays(1, &(vao));
 	glBindVertexArray(vao);
@@ -361,6 +375,13 @@ void TriangleSoup::createSphere(float radius, int segments) {
  	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 	 	3*ntris*sizeof(GLuint), indexarray, GL_STATIC_DRAW);
 
+    /*Also set INSTANCE*/
+    glEnableVertexAttribArray(3);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribDivisor(3, 1); // tell OpenGL this is an instanced vertex attribute.
+
 	// Deactivate (unbind) the VAO and the buffers again.
 	// Do NOT unbind the buffers while the VAO is still bound.
 	// The index buffer is an essential part of the VAO state.
@@ -368,8 +389,7 @@ void TriangleSoup::createSphere(float radius, int segments) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
  	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-};
-
+}
 
 /*
  * readObj(const char* filename)
@@ -581,7 +601,7 @@ void TriangleSoup::readOBJ(const char* filename) {
  	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	return;
-};
+}
 
 /* Print data from a TriangleSoup object, for debugging purposes */
 void TriangleSoup::print() {
@@ -597,7 +617,7 @@ void TriangleSoup::print() {
          printf("%d: %d %d %d\n", i,
          indexarray[3*i], indexarray[3*i+1], indexarray[3*i+2]);
      }
-};
+}
 
 /* Print information about a TriangleSoup object (stats and extents) */
 void TriangleSoup::printInfo() {
@@ -628,17 +648,16 @@ void TriangleSoup::printInfo() {
      printf("ymax: %8.2f\n", ymax);
      printf("zmin: %8.2f\n", zmin);
      printf("zmax: %8.2f\n", zmax);
-};
+}
 
 /* Render the geometry in a TriangleSoup object */
 void TriangleSoup::render() {
 
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
-	// (mode, vertex count, type, element array buffer offset)
+	//glDrawArraysInstanced(GL_TRIANGLES, 3 * ntris, 16); //Instancing
 	glBindVertexArray(0);
-
-};
+}
 
 /*
  * private
@@ -647,4 +666,30 @@ void TriangleSoup::render() {
  */
 void TriangleSoup::printError(const char *errtype, const char *errmsg) {
   fprintf(stderr, "%s: %s\n", errtype, errmsg);
-};
+}
+
+glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
+
+    float k = 0.014;
+
+    //glm::vec2 startPositions[17]; //16 Balls
+
+    startPositions[0].x = (float)0.5325;       startPositions[0].y = (float)0.5325;
+    startPositions[1].x = (float)1.5975-2.0*k; startPositions[1].y = (float)0.5325;
+    startPositions[2].x = (float)1.6470-k;     startPositions[2].y = (float)0.5039-k;
+    startPositions[3].x = (float)1.6470-k;     startPositions[3].y = (float)0.5611+k;
+    startPositions[4].x = (float)1.6965;       startPositions[4].y = (float)0.4753-k;
+    startPositions[5].x = (float)1.6965;       startPositions[5].y = (float)0.5325;
+    startPositions[6].x = (float)1.6965;       startPositions[6].y = (float)0.5897+k;
+    startPositions[7].x = (float)1.7460+k;     startPositions[7].y = (float)0.4467-2*k;
+    startPositions[8].x = (float)1.7460+k;     startPositions[8].y = (float)0.5039-k;
+    startPositions[9].x = (float)1.7460+k;     startPositions[9].y = (float)0.5611+k;
+    startPositions[10].x = (float)1.7460+k;    startPositions[10].y = (float)0.6183+2*k;
+    startPositions[11].x = (float)1.7955+2*k;  startPositions[11].x = (float)0.4181-2*k;
+    startPositions[12].x = (float)1.7955+2*k;  startPositions[12].x = (float)0.4753-k;
+    startPositions[13].x = (float)1.7955+2*k;  startPositions[13].y = (float)0.532;
+    startPositions[14].x = (float)1.7955+2*k;  startPositions[14].y = (float)0.5897+k;
+    startPositions[15].x = (float)1.7955+2*k;  startPositions[15].y = (float)0.6469+2*k;
+
+    return startPositions;
+}

@@ -129,7 +129,7 @@ void Utilities::mat4rotx(float M[], float angle) {
 
 void Utilities::mat4roty(float M[], float angle) {
     M[0] =  cos(angle); M[1] = 0;          M[2] = -sin(angle);M[3] = 0;
-    M[4] =  0;          M[5] = 1.0f;          M[6] = 0;          M[7] = 0;
+    M[4] =  0;          M[5] = 1.0f;       M[6] = 0;          M[7] = 0;
     M[8] =  sin(angle); M[9] = 0;          M[10] = cos(angle);M[11] = 0;
     M[12] = 0;          M[13] = 0;         M[14] = 0;         M[15] = 1.0f;
 }
@@ -153,6 +153,15 @@ void Utilities::mat4scale(float M[], float scale) {
     M[4] = 0;     M[5] = scale; M[6] = 0;      M[7] = 0;
     M[8] = 0;     M[9] = 0;     M[10] = scale; M[11] = 0;
     M[12] = 0;    M[13] = 0;    M[14] = 0;     M[15] = 1.0f;
+}
+
+void Utilities::mat4perspective(float M[], float vfov, float aspect, float znear, float zfar) {
+    float f = 1/tan(vfov/2.0);
+
+    M[0] = f/aspect; M[1] = 0; M[2] = 0;                            M[3] = 0;
+    M[4] = 0;        M[5] = f; M[6] = 0;                            M[7] = 0;
+    M[8] = 0;        M[9] = 0; M[10] = -(zfar+znear)/(zfar-znear);  M[11] = -1;
+    M[12] = 0;       M[13] = 0;M[14] = -(2*zfar*znear)/(zfar-znear);M[15] = 0.0f;
 }
 /*
  * printError() - Signal an error.

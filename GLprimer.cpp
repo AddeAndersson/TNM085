@@ -22,6 +22,7 @@
 
 // File and console I/O for logging and error reporting
 #include <iostream>
+#include <sstream>
 
 // In MacOS X, tell GLFW to include the modern OpenGL headers.
 // Windows does not want this, so we make this Mac-only.
@@ -36,8 +37,10 @@
 #include "Utilities.hpp"
 #include "Shader.hpp"
 #include "TriangleSoup.hpp"
+#include "Rotator.hpp"
 
 //Declarations
+
 
 
 /*
@@ -47,23 +50,33 @@ int main(int argc, char *argv[]) {
 
     using namespace std;
 
+    //Declarations
 	int width, height;
     Shader myShader;
-    GLfloat T[16];
-    GLfloat T2[16];
+    GLfloat Tt[16]; GLfloat Tx[16]; //Temporary matrices
+    GLfloat Ty[16]; //Temporary matrices
+    GLfloat T[16]; GLfloat T2[16]; //Object mat
+    GLfloat P[16]; //Perspective
+    GLfloat MV[16]; //Modelview matrix
     GLint location_T;
+    GLint location_P;
+    GLint location_MV;
     float time;
     GLint location_time;
     TriangleSoup myShape;
+
+    MouseRotator myMouseRotator;
+    KeyTranslator myKeyTranslator;
 
     Ball myBall = Ball(0.0, 0.0, 1.0, 6.0, 0.0, 0.0);
 
 
     //Constant Matrices (Not animated)
-    /*Utilities::mat4translate(T, cos(time), 0.0, 0.0);
-    Utilities::mat4rotz(T2, time);
+    Utilities::mat4perspective(P, M_PI/4, 1, 0.1, 100.0);
+    Utilities::mat4translate(T2, 0.0, 0.0, -3.0);
+    //Utilities::mat4translate(MV, 0.0, 0.0, 0.0);
 
-    Utilities::mat4mult(T, T2, T);*/
+    //Utilities::mat4mult(T, T2, T);*/
     //Utilities::mat4print(T);
 
     const GLFWvidmode *vidmode;  // GLFW struct to hold information about the display
@@ -77,7 +90,7 @@ int main(int argc, char *argv[]) {
 
 	// Make sure we are getting a GL context of at least version 3.3
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); //3 default
 	// Exclude old legacy cruft from the context. We don't need it, and we don't want it.
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -95,6 +108,11 @@ int main(int argc, char *argv[]) {
     // (This step is strictly required, or things will simply not work)
     glfwMakeContextCurrent(window);
 
+    //Initiate interactions
+    myMouseRotator.init(window);
+    myKeyTranslator.init(window);
+
+
     Utilities::loadExtensions();
 
     //Create objects here
@@ -109,6 +127,9 @@ int main(int argc, char *argv[]) {
         cout << "Unable to locate variable 'time' in shader!" << endl;
 	}
 	location_T = glGetUniformLocation(myShader.programID, "T");
+	location_P = glGetUniformLocation(myShader.programID, "P");
+	location_MV = glGetUniformLocation(myShader.programID, "MV");
+
 
     // Show some useful information on the GL context
     cout << "GL vendor:       " << glGetString(GL_VENDOR) << endl;
@@ -134,21 +155,40 @@ int main(int argc, char *argv[]) {
 		// Set the clear color and depth, and clear the buffers for drawing
         glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+
+        //Interaction
+        myMouseRotator.poll(window);
+        myKeyTranslator.poll(window);
+        Utilities::mat4rotx(Tx, myMouseRotator.theta);
+        Utilities::mat4roty(Ty, myMouseRotator.phi);
+        Utilities::mat4translate(Tt, myKeyTranslator.tran_x, myKeyTranslator.tran_y, myKeyTranslator.tran_z-3.0);
+
+        //MV Controls the camera, FPS-style
+        //I ordning: Translatera från origo, rotera, translatera med knappar
+        Utilities::mat4mult(Tx,Ty,MV);
+        Utilities::mat4mult(MV,T2,MV);
+        Utilities::mat4mult(Tt,MV,MV);
+
 
         /* ---- Rendering code should go here ---- */
         time = (float)glfwGetTime();    //Number of seconds since program started
         glUseProgram(myShader.programID);   //Activate the shader to set its variable
         glUniform1f(location_time, time); //Copy value to shader
 
-        //Animated Matrices
-        Utilities::mat4translate(T, cos(time), 0.0, 0.0);
-        Utilities::mat4rotz(T2, time);
+        //Send projection and modelview matrices
+        glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
+        glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
-        Utilities::mat4mult(T, T2, T);
-
-        //Animated matrices
+        //Send to shaders and render for object 1
+        Utilities::mat4translate(T, 0.0, 0.0, 0.0);
         glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
+        myShape.render();
 
+        //Update object matrix and send to shaders and render for object 2
+        Utilities::mat4translate(T, 1.0, 0.0, 0.0);
+        glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
         myShape.render();
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
@@ -170,3 +210,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+

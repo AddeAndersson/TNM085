@@ -18,6 +18,7 @@
 #include <GLFW/glfw3.h>
 #include "Ball.hpp"
 
+//#include <glm/glm/glm.hpp> //API for use of OpenGL Mathematics
 #include <cstdio>  // For console messages
 #include <cmath>
 
@@ -82,6 +83,14 @@ void mat4roty(float M[], float angle);
 void mat4rotz(float M[], float angle);
 void mat4translate(float M[], float x, float y, float z);
 void mat4scale(float M[], float scale);
+
+
+//M is the matrix we want to create (an output argument)
+//vfov is the vertical field of view (in the y-direction)
+//aspect is the aspect ratio of the viewport (width/height)
+//znear is the distance to the near clip plane (znear > 0)
+//zfar is the distance to the far clip plane (zfar > znear)
+void mat4perspective(float M[], float vfov, float aspect, float znear, float zfar);
 
 /*
  * loadExtensions() - Load OpenGL extensions for anything above OpenGL

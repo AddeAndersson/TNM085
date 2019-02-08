@@ -21,11 +21,12 @@
 #endif // M_PI
 
 
-class KeyRotator {
+class KeyTranslator {
 
 public:
-	float phi;
-	float theta;
+    float tran_x;
+    float tran_y;
+	float tran_z;
 
 private:
 	double lastTime;

@@ -1,4 +1,4 @@
-
+#include <glm/glm/glm.hpp> //API for use of OpenGL Mathematics
 #include <iostream>
 #include <cmath>
 
@@ -31,4 +31,5 @@ class Ball {
         float getPosY();
         void printVel();
         void updateVel(float newVelx, float newVely);
+        glm::vec2 *getStartPos();
 };
