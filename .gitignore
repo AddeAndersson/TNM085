@@ -1,0 +1,9 @@
+#Dessa filer ska ignoreras:
+
+Matlab/
+GL/
+GLFW/
+meshes/
+testures/
+Makefile
+fkoeff.m
