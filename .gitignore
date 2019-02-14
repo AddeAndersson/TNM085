@@ -1,7 +1,2 @@
 /Matlab
-GL
-GLFW
-meshes
-testures
-Makefile
-fkoeff.m
+/fkoeff.m
