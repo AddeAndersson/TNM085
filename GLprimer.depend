@@ -159,7 +159,7 @@
 	<iostream>
 	<cmath>
 
-1549628575 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
+1550140466 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
 	<iostream>
 	<sstream>
 	<GLFW/glfw3.h>
@@ -180,7 +180,7 @@
 	<GL/gl.h>
 	<GL/glu.h>
 
-1549621057 c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.hpp
+1550133089 c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.hpp
 	<GLFW/glfw3.h>
 	"Ball.hpp"
 	<cstdio>
@@ -202,10 +202,11 @@
 	"Utilities.hpp"
 	<cstdio>
 
-1549623437 c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.hpp
+1550136356 c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.hpp
 	<GLFW/glfw3.h>
 	<cstdio>
 	<cmath>
+	<stdlib.h>
 	<cstring>
 	<glm/glm/glm.hpp>
 	<glm/gtc/matrix_transform.hpp>
@@ -231,10 +232,10 @@
 	<cstring>
 	"Utilities.hpp"
 
-1549628558 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
+1550137214 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
 	"TriangleSoup.hpp"
 
-1549531441 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
+1550133089 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
 	"Utilities.hpp"
 	<math.h>
 

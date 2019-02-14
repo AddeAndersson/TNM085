@@ -51,6 +51,9 @@ PFNGLENABLEVERTEXATTRIBARRAYPROC  glEnableVertexAttribArray  = NULL;
 PFNGLVERTEXATTRIBPOINTERPROC      glVertexAttribPointer      = NULL;
 PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray = NULL;
 PFNGLGENERATEMIPMAPPROC           glGenerateMipmap           = NULL;
+PFNGLVERTEXATTRIBDIVISORPROC      glVertexAttribDivisor = NULL;
+PFNGLDRAWARRAYSINSTANCEDPROC      glDrawArraysInstanced = NULL;
+PFNGLDRAWELEMENTSINSTANCEDPROC    glDrawElementsInstanced = NULL;
 #endif
 void Utilities::createVertexBuffer(int location, int dimensions, const float *data, int datasize) {
     GLuint bufferID;
@@ -222,11 +225,14 @@ void Utilities::loadExtensions() {
 	glEnableVertexAttribArray  = (PFNGLENABLEVERTEXATTRIBARRAYPROC)glfwGetProcAddress("glEnableVertexAttribArray");
 	glVertexAttribPointer      = (PFNGLVERTEXATTRIBPOINTERPROC)glfwGetProcAddress("glVertexAttribPointer");
 	glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)glfwGetProcAddress("glDisableVertexAttribArray");
+	glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)glfwGetProcAddress("glVertexAttribDivisor");
+	glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)glfwGetProcAddress("glDrawArraysInstanced");
+	glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)glfwGetProcAddress("glDrawElementsInstanced");
 
 	if( !glGenBuffers || !glIsBuffer || !glBindBuffer || !glBufferData || !glDeleteBuffers ||
 	    !glGenVertexArrays || !glIsVertexArray || !glBindVertexArray || !glDeleteVertexArrays ||
 		!glEnableVertexAttribArray || !glVertexAttribPointer ||
-		!glDisableVertexAttribArray )
+		!glDisableVertexAttribArray || !glVertexAttribDivisor || !glDrawArraysInstanced || !glDrawElementsInstanced)
     	{
 	   		printError("GL init error", "One or more required OpenGL vertex array functions were not found");
             return;

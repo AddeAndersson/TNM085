@@ -245,6 +245,19 @@ void TriangleSoup::createSphere(float radius, int segments) {
 
 	getStartPos(startPositions);
 
+	//Refactor later
+    glm::mat4 *modelMatrices;
+    modelMatrices = new glm::mat4[16];
+    //Initialize matrices with random values for testing
+    for(unsigned int n = 0; n < 16; ++n){
+        glm::mat4 model = glm::mat4(1.0f);
+        float xrand = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/0.1f));
+        float yrand = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/0.1f));
+        float zrand = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/0.1f));
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(xrand, yrand, zrand));
+        modelMatrices[n] = model;
+    }
+
 	// Delete any previous content in the TriangleSoup object
 	clean();
 
@@ -362,25 +375,39 @@ void TriangleSoup::createSphere(float radius, int segments) {
 	// Not normalized (GL_FALSE)
 	// Stride 8 (interleaved array with 8 floats per vertex)
 	// Array buffer offset 0, 3, 6 (offset into first vertex)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-		8*sizeof(GLfloat), (void*)0); // xyz coordinates
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-		8*sizeof(GLfloat), (void*)(3*sizeof(GLfloat))); // normals
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
-		8*sizeof(GLfloat), (void*)(6*sizeof(GLfloat))); // texcoords
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)0); // xyz coordinates
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(3*sizeof(GLfloat))); // normals
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(6*sizeof(GLfloat))); // texcoords
 
  	// Activate the index buffer
  	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
  	// Present our vertex indices to OpenGL
- 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-	 	3*ntris*sizeof(GLuint), indexarray, GL_STATIC_DRAW);
+ 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ntris*sizeof(GLuint), indexarray, GL_STATIC_DRAW);
 
-    /*Also set INSTANCE*/
+    //Also set INSTANCE
     glEnableVertexAttribArray(3);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glVertexAttribDivisor(3, 1); // tell OpenGL this is an instanced vertex attribute.
+
+    //Matrices for translation/rotation
+    unsigned int buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, 16*sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4,4, GL_FLOAT, GL_FALSE, 4*sizeof(glm::vec4), (void*)0);
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5,4, GL_FLOAT, GL_FALSE, 4*sizeof(glm::vec4), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6,4, GL_FLOAT, GL_FALSE, 4*sizeof(glm::vec4), (void*)(2*sizeof(glm::vec4)));
+    glEnableVertexAttribArray(7);
+    glVertexAttribPointer(7,4, GL_FLOAT, GL_FALSE, 4*sizeof(glm::vec4), (void*)(3*sizeof(glm::vec4)));
+    glVertexAttribDivisor(4,1);
+    glVertexAttribDivisor(5,1);
+    glVertexAttribDivisor(6,1);
+    glVertexAttribDivisor(7,1);
 
 	// Deactivate (unbind) the VAO and the buffers again.
 	// Do NOT unbind the buffers while the VAO is still bound.
@@ -654,8 +681,9 @@ void TriangleSoup::printInfo() {
 void TriangleSoup::render() {
 
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
-	//glDrawArraysInstanced(GL_TRIANGLES, 3 * ntris, 16); //Instancing
+	//glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
+	//glDrawArraysInstanced(GL_TRIANGLES, 0, 3*ntris, 16); //Instancing
+	glDrawElementsInstanced(GL_TRIANGLES, 3*ntris, GL_UNSIGNED_INT, 0, 16); //Instancing
 	glBindVertexArray(0);
 }
 
@@ -675,7 +703,7 @@ glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
     //glm::vec2 startPositions[17]; //16 Balls
 
     startPositions[0].x = (float)0.5325;       startPositions[0].y = (float)0.5325;
-    startPositions[1].x = (float)1.5975-2.0*k; startPositions[1].y = (float)0.5325;
+    startPositions[1].x = (float)1.5975-2*k;   startPositions[1].y = (float)0.5325;
     startPositions[2].x = (float)1.6470-k;     startPositions[2].y = (float)0.5039-k;
     startPositions[3].x = (float)1.6470-k;     startPositions[3].y = (float)0.5611+k;
     startPositions[4].x = (float)1.6965;       startPositions[4].y = (float)0.4753-k;
@@ -685,10 +713,10 @@ glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
     startPositions[8].x = (float)1.7460+k;     startPositions[8].y = (float)0.5039-k;
     startPositions[9].x = (float)1.7460+k;     startPositions[9].y = (float)0.5611+k;
     startPositions[10].x = (float)1.7460+k;    startPositions[10].y = (float)0.6183+2*k;
-    startPositions[11].x = (float)1.7955+2*k;  startPositions[11].x = (float)0.4181-2*k;
-    startPositions[12].x = (float)1.7955+2*k;  startPositions[12].x = (float)0.4753-k;
-    startPositions[13].x = (float)1.7955+2*k;  startPositions[13].y = (float)0.532;
-    startPositions[14].x = (float)1.7955+2*k;  startPositions[14].y = (float)0.5897+k;
+    startPositions[11].x = (float)1.7955+2*k;  startPositions[11].y = (float)0.4181-2*k;
+    startPositions[12].x = (float)1.7955+2*k;  startPositions[12].y = (float)0.4753-k;
+    startPositions[13].x = (float)1.7955+2*k;  startPositions[13].y = (float)0.5325;
+    startPositions[14].x = (float)1.7955+2*k;  startPositions[14].y = (float)0.5897+2*k;
     startPositions[15].x = (float)1.7955+2*k;  startPositions[15].y = (float)0.6469+2*k;
 
     return startPositions;

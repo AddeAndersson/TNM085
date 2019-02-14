@@ -23,6 +23,7 @@
 
 #include <cstdio>  // For C-style file input in readOBJ()
 #include <cmath>   // For sin() and cos() in soupCreateSphere()
+#include <stdlib.h> // For rand()
 #include <cstring> // For strcmp() - a leftover from the C version
 #include <glm/glm/glm.hpp> //API for use of OpenGL Mathematics
 #include <glm/gtc/matrix_transform.hpp>

@@ -55,10 +55,10 @@ int main(int argc, char *argv[]) {
     Shader myShader;
     GLfloat Tt[16]; GLfloat Tx[16]; //Temporary matrices
     GLfloat Ty[16]; //Temporary matrices
-    GLfloat T[16]; GLfloat T2[16]; //Object mat
+    GLfloat T2[16]; //Part of MV mat
     GLfloat P[16]; //Perspective
     GLfloat MV[16]; //Modelview matrix
-    GLint location_T;
+
     GLint location_P;
     GLint location_MV;
     float time;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 
     //Constant Matrices (Not animated)
     Utilities::mat4perspective(P, M_PI/4, 1, 0.1, 100.0);
-    Utilities::mat4translate(T2, 0.0, 0.0, -3.0);
+    Utilities::mat4translate(T2, 0.0, 0.0, -2.0);
     //Utilities::mat4translate(MV, 0.0, 0.0, 0.0);
 
     //Utilities::mat4mult(T, T2, T);*/
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
     Utilities::loadExtensions();
 
     //Create objects here
-    myShape.createSphere(0.5f, 6);
+    myShape.createSphere(0.0286f, 6);
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
@@ -126,7 +126,6 @@ int main(int argc, char *argv[]) {
 	if(location_time == -1) {
         cout << "Unable to locate variable 'time' in shader!" << endl;
 	}
-	location_T = glGetUniformLocation(myShader.programID, "T");
 	location_P = glGetUniformLocation(myShader.programID, "P");
 	location_MV = glGetUniformLocation(myShader.programID, "MV");
 
@@ -139,6 +138,7 @@ int main(int argc, char *argv[]) {
 
     glfwSwapInterval(0); // Do not wait for screen refresh between frames
 
+     myShape.printInfo();
 
     // Main loop
     while(!glfwWindowShouldClose(window))
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
 
-        //Interaction
+        //Interaction, Camera
         myMouseRotator.poll(window);
         myKeyTranslator.poll(window);
         Utilities::mat4rotx(Tx, myMouseRotator.theta);
@@ -182,13 +182,6 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
         //Send to shaders and render for object 1
-        Utilities::mat4translate(T, 0.0, 0.0, 0.0);
-        glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
-        myShape.render();
-
-        //Update object matrix and send to shaders and render for object 2
-        Utilities::mat4translate(T, 1.0, 0.0, 0.0);
-        glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
         myShape.render();
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
