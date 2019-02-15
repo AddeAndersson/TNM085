@@ -1,5 +1,8 @@
 #include "TriangleSoup.hpp"
 glm::vec2 *getStartPos(glm::vec2 startPositions[]);
+void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y);
+glm::vec2 *startVelocities(glm::vec2 velocities[]);
+float time = (float)glfwGetTime();
 
 /* Constructor: initialize a TriangleSoup object to all zeros */
 TriangleSoup::TriangleSoup() {
@@ -246,7 +249,7 @@ void TriangleSoup::createSphere(float radius, int segments) {
 	getStartPos(startPositions);
 
 	//Refactor later
-    glm::mat4 *modelMatrices;
+    /*glm::mat4 *modelMatrices;
     modelMatrices = new glm::mat4[16];
     //Initialize matrices with random values for testing
     for(unsigned int n = 0; n < 16; ++n){
@@ -256,7 +259,7 @@ void TriangleSoup::createSphere(float radius, int segments) {
         float zrand = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/0.1f));
         model = glm::translate(glm::mat4(1.0f), glm::vec3(xrand, yrand, zrand));
         modelMatrices[n] = model;
-    }
+    }*/
 
 	// Delete any previous content in the TriangleSoup object
 	clean();
@@ -392,7 +395,7 @@ void TriangleSoup::createSphere(float radius, int segments) {
     glVertexAttribDivisor(3, 1); // tell OpenGL this is an instanced vertex attribute.
 
     //Matrices for translation/rotation
-    unsigned int buffer;
+    /*unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, 16*sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
@@ -407,14 +410,14 @@ void TriangleSoup::createSphere(float radius, int segments) {
     glVertexAttribDivisor(4,1);
     glVertexAttribDivisor(5,1);
     glVertexAttribDivisor(6,1);
-    glVertexAttribDivisor(7,1);
+    glVertexAttribDivisor(7,1);*/
 
 	// Deactivate (unbind) the VAO and the buffers again.
 	// Do NOT unbind the buffers while the VAO is still bound.
 	// The index buffer is an essential part of the VAO state.
-	glBindVertexArray(0);
+	/*glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
- 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+ 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
 
 }
 
@@ -677,8 +680,45 @@ void TriangleSoup::printInfo() {
      printf("zmax: %8.2f\n", zmax);
 }
 
+void TriangleSoup::setMatrices() {
+
+    //Refactor later
+    glm::mat4 *modelMatrices;
+    modelMatrices = new glm::mat4[16];
+    //Initialize matrices with random values for testing
+    for(unsigned int n = 0; n < 16; ++n){
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        modelMatrices[n] = model;
+    }
+
+    //Matrices for translation/rotation
+    unsigned int buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, 16*sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4,4, GL_FLOAT, GL_FALSE, 4*sizeof(glm::vec4), (void*)0);
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5,4, GL_FLOAT, GL_FALSE, 4*sizeof(glm::vec4), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6,4, GL_FLOAT, GL_FALSE, 4*sizeof(glm::vec4), (void*)(2*sizeof(glm::vec4)));
+    glEnableVertexAttribArray(7);
+    glVertexAttribPointer(7,4, GL_FLOAT, GL_FALSE, 4*sizeof(glm::vec4), (void*)(3*sizeof(glm::vec4)));
+    glVertexAttribDivisor(4,1);
+    glVertexAttribDivisor(5,1);
+    glVertexAttribDivisor(6,1);
+    glVertexAttribDivisor(7,1);
+
+    glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+ 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 /* Render the geometry in a TriangleSoup object */
 void TriangleSoup::render() {
+
+	//setMatrices();
 
 	glBindVertexArray(vao);
 	//glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
@@ -720,4 +760,22 @@ glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
     startPositions[15].x = (float)1.7955+2*k;  startPositions[15].y = (float)0.6469+2*k;
 
     return startPositions;
+}
+
+void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y) {
+    velocities[index].x = vel_x;
+    velocities[index].y = vel_y;
+}
+
+glm::vec2 *startVelocities(glm::vec2 velocities[]){
+    //glm::vec2 startPositions[17]; //16 Balls
+    for(int i = 1; i < 16; ++i){
+        velocities[i].x = 0.0f;
+        velocities[i].y = 0.0f;
+    }
+
+    velocities[0].x = 19.0f;
+    velocities[0].y = 0.0f;
+
+    return velocities;
 }

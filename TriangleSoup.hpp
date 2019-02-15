@@ -80,6 +80,8 @@ void print();
 /* Print information about a triangleSoup object (stats and extents) */
 void printInfo();
 
+void setMatrices();
+
 /* Render the geometry in a triangleSoup object */
 void render();
 

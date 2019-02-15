@@ -16,13 +16,7 @@ void main() {
     vec3 transformedNormal = mat3(MV)*mat3(InstanceMatrix)*Normal;
     N = normalize(transformedNormal);
 
-if(gl_InstanceID == 2){
-	gl_Position = P*MV*InstanceMatrix*vec4(Position + vec3(time, 0.0, 0.0), 1.0); //T is matrix
-}
-else{
 	gl_Position = P*MV*InstanceMatrix*vec4(Position + vec3(StartPos, 0.0), 1.0); //T is matrix
-}
 
-    
     st = TexCoord;
 }

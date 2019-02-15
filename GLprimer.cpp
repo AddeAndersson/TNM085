@@ -182,6 +182,7 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
         //Send to shaders and render for object 1
+        myShape.setMatrices();
         myShape.render();
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
