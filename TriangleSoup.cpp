@@ -1,10 +1,6 @@
 #include "TriangleSoup.hpp"
-<<<<<<< HEAD
-=======
-//glm::vec2 *getStartPos(glm::vec2 startPositions[]);
->>>>>>> dd2ea301bf5c6b2feb0d36b78c894a6a9c54e937
 void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y);
-glm::vec2 *startVelocities(glm::vec2 velocities[]);
+//glm::vec2 *startVelocities(glm::vec2 velocities[]);
 
 /* Constructor: initialize a TriangleSoup object to all zeros */
 TriangleSoup::TriangleSoup() {
@@ -684,7 +680,7 @@ void TriangleSoup::setMatrices() {
     glm::mat4 *modelMatrices;
     glm::vec2 velocities[16];
 
-	startVelocities(velocities);
+	//startVelocities(velocities);
     modelMatrices = new glm::mat4[16];
     //Initialize matrices with random values for testing
 
@@ -744,51 +740,10 @@ void TriangleSoup::render() {
 void TriangleSoup::printError(const char *errtype, const char *errmsg) {
   fprintf(stderr, "%s: %s\n", errtype, errmsg);
 }
-<<<<<<< HEAD
-
-=======
-/*
-glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
-
-    float k = 0.014;
-
-    //glm::vec2 startPositions[17]; //16 Balls
-
-    startPositions[0].x = (float)0.5325;       startPositions[0].y = (float)0.5325;
-    startPositions[1].x = (float)1.5975-2*k;   startPositions[1].y = (float)0.5325;
-    startPositions[2].x = (float)1.6470-k;     startPositions[2].y = (float)0.5039-k;
-    startPositions[3].x = (float)1.6470-k;     startPositions[3].y = (float)0.5611+k;
-    startPositions[4].x = (float)1.6965;       startPositions[4].y = (float)0.4753-k;
-    startPositions[5].x = (float)1.6965;       startPositions[5].y = (float)0.5325;
-    startPositions[6].x = (float)1.6965;       startPositions[6].y = (float)0.5897+k;
-    startPositions[7].x = (float)1.7460+k;     startPositions[7].y = (float)0.4467-2*k;
-    startPositions[8].x = (float)1.7460+k;     startPositions[8].y = (float)0.5039-k;
-    startPositions[9].x = (float)1.7460+k;     startPositions[9].y = (float)0.5611+k;
-    startPositions[10].x = (float)1.7460+k;    startPositions[10].y = (float)0.6183+2*k;
-    startPositions[11].x = (float)1.7955+2*k;  startPositions[11].y = (float)0.4181-2*k;
-    startPositions[12].x = (float)1.7955+2*k;  startPositions[12].y = (float)0.4753-k;
-    startPositions[13].x = (float)1.7955+2*k;  startPositions[13].y = (float)0.5325;
-    startPositions[14].x = (float)1.7955+2*k;  startPositions[14].y = (float)0.5897+2*k;
-    startPositions[15].x = (float)1.7955+2*k;  startPositions[15].y = (float)0.6469+2*k;
-
-    return startPositions;
-}*/
->>>>>>> dd2ea301bf5c6b2feb0d36b78c894a6a9c54e937
 
 void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y) {
     velocities[index].x = vel_x;
     velocities[index].y = vel_y;
 }
 
-glm::vec2 *startVelocities(glm::vec2 velocities[]){
-    //glm::vec2 startPositions[17]; //16 Balls
-    for(int i = 1; i < 16; ++i){
-        velocities[i].x = 0.0f;
-        velocities[i].y = 0.0f;
-    }
 
-    velocities[0].x = 19.0f;
-    velocities[0].y = 0.0f;
-
-    return velocities;
-}
