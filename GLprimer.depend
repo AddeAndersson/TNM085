@@ -159,7 +159,7 @@
 	<iostream>
 	<cmath>
 
-1550216913 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
+1550244275 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
 	<iostream>
 	<sstream>
 	<GLFW/glfw3.h>
@@ -202,7 +202,7 @@
 	"Utilities.hpp"
 	<cstdio>
 
-1550216943 c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.hpp
+1550234943 c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.hpp
 	<GLFW/glfw3.h>
 	<cstdio>
 	<cmath>
@@ -232,7 +232,7 @@
 	<cstring>
 	"Utilities.hpp"
 
-1550217984 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
+1550242230 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
 	"TriangleSoup.hpp"
 
 1550133089 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
@@ -1528,9 +1528,10 @@
 
 1550229995 d:\skola\modelleringsprojekt(tnm085)\tnm085\glm\glm\simd\integer.h
 
-1550245158 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
+1550736611 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
 	<iostream>
 	<sstream>
+	<string>
 	<GLFW/glfw3.h>
 	"Utilities.hpp"
 	"Shader.hpp"
@@ -1602,7 +1603,7 @@
 1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\texture.cpp
 	"Texture.hpp"
 
-1550245149 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\trianglesoup.cpp
+1550735369 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\trianglesoup.cpp
 	"TriangleSoup.hpp"
 
 1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\utilities.cpp

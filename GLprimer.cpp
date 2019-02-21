@@ -23,6 +23,7 @@
 // File and console I/O for logging and error reporting
 #include <iostream>
 #include <sstream>
+#include <string>
 
 // In MacOS X, tell GLFW to include the modern OpenGL headers.
 // Windows does not want this, so we make this Mac-only.
@@ -41,8 +42,11 @@
 #include "Texture.hpp"
 
 //Declarations
-
-
+void updateAndRender(float x, float y);
+GLfloat T[16]; //Object Matrix
+GLfloat Trot[16]; //Object Rotation
+GLint location_T; //Object translations
+TriangleSoup myShape;
 
 /*
  * main(argc, argv) - the standard C++ entry point for the program
@@ -60,18 +64,17 @@ int main(int argc, char *argv[]) {
     GLfloat P[16]; //Perspective
     GLfloat MV[16]; //Modelview matrix
 
+    //Animation matrices
     GLint location_P;
     GLint location_MV;
     float time;
     GLint location_time;
 
-    TriangleSoup sphere0;
-    TriangleSoup sphere1;
 
     Texture tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
     tex10, tex11, tex12, tex13, tex14, tex15;
-    GLint location_tex;
 
+    GLint location_tex;
 
     MouseRotator myMouseRotator;
     KeyTranslator myKeyTranslator;
@@ -79,10 +82,6 @@ int main(int argc, char *argv[]) {
     //Constant Matrices (Not animated)
     Utilities::mat4perspective(P, M_PI/4, 1, 0.1, 100.0);
     Utilities::mat4translate(T2, 0.0, 0.0, -2.0);
-    //Utilities::mat4translate(MV, 0.0, 0.0, 0.0);
-
-    //Utilities::mat4mult(T, T2, T);*/
-    //Utilities::mat4print(T);
 
     const GLFWvidmode *vidmode;  // GLFW struct to hold information about the display
 	GLFWwindow *window;    // GLFW struct to hold information about the window
@@ -121,7 +120,7 @@ int main(int argc, char *argv[]) {
     Utilities::loadExtensions();
 
     //Create objects here
-    sphere1.createSphere(0.0286f, 6);
+    myShape.createSphere(0.0286f, 32);
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
@@ -153,6 +152,9 @@ int main(int argc, char *argv[]) {
 	}
 	location_P = glGetUniformLocation(myShader.programID, "P");
 	location_MV = glGetUniformLocation(myShader.programID, "MV");
+	location_T = glGetUniformLocation(myShader.programID, "T");
+
+
 
 
     // Show some useful information on the GL context
@@ -163,12 +165,11 @@ int main(int argc, char *argv[]) {
 
     glfwSwapInterval(0); // Do not wait for screen refresh between frames
 
-     sphere1.printInfo();
-
      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
      glEnable(GL_CULL_FACE);
      glEnable(GL_DEPTH_TEST);
 
+    myShape.printInfo();
 
     // Main loop
     while(!glfwWindowShouldClose(window))
@@ -213,16 +214,14 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
+        //Render 16 objects
+        for(unsigned int i = 0; i < 16; ++i){
+            updateAndRender(time, 0.0f);
+            glBindTexture(GL_TEXTURE_2D, tex14.textureID);
+        }
 
         //Textures for object 1
 
-        glBindTexture(GL_TEXTURE_2D, tex1.textureID);
-
-        //Send to shaders and render for object 1
-        sphere1.setMatrices();
-        sphere1.render();
-
-        sphere0.render();
 
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
@@ -245,3 +244,10 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+void updateAndRender(float x, float y){
+    Utilities::mat4rotz(Trot, 0.0f);
+    Utilities::mat4translate(T, x, y, 0.0f);
+    Utilities::mat4mult(T, Trot, T);
+    glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
+    myShape.render();
+}
