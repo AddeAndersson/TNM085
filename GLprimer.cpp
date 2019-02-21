@@ -43,10 +43,13 @@
 
 //Declarations
 void updateAndRender(float x, float y);
+glm::vec2 *getStartPos(glm::vec2 startPositions[]);
 GLfloat T[16]; //Object Matrix
 GLfloat Trot[16]; //Object Rotation
+GLfloat Trot1[16];
 GLint location_T; //Object translations
 TriangleSoup myShape;
+Texture tex[16];
 
 /*
  * main(argc, argv) - the standard C++ entry point for the program
@@ -64,6 +67,10 @@ int main(int argc, char *argv[]) {
     GLfloat P[16]; //Perspective
     GLfloat MV[16]; //Modelview matrix
 
+    //Start positions
+    glm::vec2 startPositions[16];
+    getStartPos(startPositions);
+
     //Animation matrices
     GLint location_P;
     GLint location_MV;
@@ -71,7 +78,7 @@ int main(int argc, char *argv[]) {
     GLint location_time;
 
 
-    Texture tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
+    Texture tex0, tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
     tex10, tex11, tex12, tex13, tex14, tex15;
 
     GLint location_tex;
@@ -128,22 +135,22 @@ int main(int argc, char *argv[]) {
     //Create textures
     location_tex = glGetUniformLocation(myShader.programID, "tex");
 
-    tex1.createTexture("textures/1.tga");
-    tex2.createTexture("textures/2.tga");
-    tex3.createTexture("textures/3.tga");
-    tex4.createTexture("textures/4.tga");
-    tex5.createTexture("textures/5.tga");
-    tex6.createTexture("textures/6.tga");
-    tex7.createTexture("textures/7.tga");
-    tex8.createTexture("textures/8.tga");
-    tex9.createTexture("textures/9.tga");
-    tex10.createTexture("textures/10.tga");
-    tex11.createTexture("textures/11.tga");
-    tex12.createTexture("textures/12.tga");
-    tex13.createTexture("textures/13.tga");
-    tex14.createTexture("textures/14.tga");
-    tex15.createTexture("textures/15.tga");
-
+    tex0.createTexture("textures/BallCue.tga");     tex[0] = tex0;
+    tex1.createTexture("textures/Ball1.tga");       tex[1] = tex1;
+    tex2.createTexture("textures/Ball2.tga");       tex[2] = tex2;
+    tex3.createTexture("textures/Ball3.tga");       tex[3] = tex3;
+    tex4.createTexture("textures/Ball4.tga");       tex[4] = tex4;
+    tex5.createTexture("textures/Ball8.tga");       tex[5] = tex5;
+    tex6.createTexture("textures/Ball6.tga");       tex[6] = tex6;
+    tex7.createTexture("textures/Ball7.tga");       tex[7] = tex7;
+    tex8.createTexture("textures/Ball5.tga");       tex[8] = tex8;
+    tex9.createTexture("textures/Ball9.tga");       tex[9] = tex9;
+    tex10.createTexture("textures/Ball10.tga");     tex[10] = tex10;
+    tex11.createTexture("textures/Ball11.tga");     tex[11] = tex11;
+    tex12.createTexture("textures/Ball12.tga");     tex[12] = tex12;
+    tex13.createTexture("textures/Ball13.tga");     tex[13] = tex13;
+    tex14.createTexture("textures/Ball14.tga");     tex[14] = tex14;
+    tex15.createTexture("textures/Ball15.tga");     tex[15] = tex15;
 
     //Skicka variabler till shaders
 	location_time = glGetUniformLocation(myShader.programID, "time");
@@ -216,13 +223,15 @@ int main(int argc, char *argv[]) {
 
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
-            updateAndRender(time, 0.0f);
-            glBindTexture(GL_TEXTURE_2D, tex14.textureID);
+
+            glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
+
+            updateAndRender(startPositions[i].x, startPositions[i].y);
         }
 
         //Textures for object 1
-
-
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glUseProgram(0);
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
         glfwSwapBuffers(window);
@@ -245,9 +254,37 @@ int main(int argc, char *argv[]) {
 }
 
 void updateAndRender(float x, float y){
-    Utilities::mat4rotz(Trot, 0.0f);
+    Utilities::mat4rotz(Trot, (float)glfwGetTime());
+    Utilities::mat4rotx(Trot1, 0.8f);
+    Utilities::mat4mult(Trot1, Trot, Trot);
     Utilities::mat4translate(T, x, y, 0.0f);
     Utilities::mat4mult(T, Trot, T);
     glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
     myShape.render();
+}
+
+glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
+
+    float k = 0.014;
+
+    //glm::vec2 startPositions[17]; //16 Balls
+
+    startPositions[0].x = (float)0.5325;       startPositions[0].y = (float)0.5325;
+    startPositions[1].x = (float)1.5975-2*k;   startPositions[1].y = (float)0.5325;
+    startPositions[2].x = (float)1.6470-k;     startPositions[2].y = (float)0.5039-k;
+    startPositions[3].x = (float)1.6470-k;     startPositions[3].y = (float)0.5611+k;
+    startPositions[4].x = (float)1.6965;       startPositions[4].y = (float)0.4753-k;
+    startPositions[5].x = (float)1.6965;       startPositions[5].y = (float)0.5325;
+    startPositions[6].x = (float)1.6965;       startPositions[6].y = (float)0.5897+k;
+    startPositions[7].x = (float)1.7460+k;     startPositions[7].y = (float)0.4467-2*k;
+    startPositions[8].x = (float)1.7460+k;     startPositions[8].y = (float)0.5039-k;
+    startPositions[9].x = (float)1.7460+k;     startPositions[9].y = (float)0.5611+k;
+    startPositions[10].x = (float)1.7460+k;    startPositions[10].y = (float)0.6183+2*k;
+    startPositions[11].x = (float)1.7955+2*k;  startPositions[11].y = (float)0.4181-2*k;
+    startPositions[12].x = (float)1.7955+2*k;  startPositions[12].y = (float)0.4753-k;
+    startPositions[13].x = (float)1.7955+2*k;  startPositions[13].y = (float)0.5325;
+    startPositions[14].x = (float)1.7955+2*k;  startPositions[14].y = (float)0.5897+2*k;
+    startPositions[15].x = (float)1.7955+2*k;  startPositions[15].y = (float)0.6469+2*k;
+
+    return startPositions;
 }
