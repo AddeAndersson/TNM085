@@ -159,7 +159,7 @@
 	<iostream>
 	<cmath>
 
-1550244275 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
+1550735989 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
 	<iostream>
 	<sstream>
 	<GLFW/glfw3.h>
@@ -167,6 +167,7 @@
 	"Shader.hpp"
 	"TriangleSoup.hpp"
 	"Rotator.hpp"
+	"Texture.hpp"
 
 1549524385 c:\skola\tnm085 - modelleringsprojekt\opengl\glfw\glfw3.h
 	<stddef.h>
@@ -232,7 +233,7 @@
 	<cstring>
 	"Utilities.hpp"
 
-1550242230 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
+1550736066 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
 	"TriangleSoup.hpp"
 
 1550133089 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
