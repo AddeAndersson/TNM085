@@ -64,8 +64,12 @@ int main(int argc, char *argv[]) {
     GLint location_MV;
     float time;
     GLint location_time;
-    TriangleSoup myShape;
-    Texture tex1;
+
+    TriangleSoup sphere0;
+    TriangleSoup sphere1;
+
+    Texture tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
+    tex10, tex11, tex12, tex13, tex14, tex15;
     GLint location_tex;
 
 
@@ -117,14 +121,30 @@ int main(int argc, char *argv[]) {
     Utilities::loadExtensions();
 
     //Create objects here
-    myShape.createSphere(0.0286f, 6);
+    sphere1.createSphere(0.0286f, 6);
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
 
     //Create textures
     location_tex = glGetUniformLocation(myShader.programID, "tex");
+
     tex1.createTexture("textures/1.tga");
+    tex2.createTexture("textures/2.tga");
+    tex3.createTexture("textures/3.tga");
+    tex4.createTexture("textures/4.tga");
+    tex5.createTexture("textures/5.tga");
+    tex6.createTexture("textures/6.tga");
+    tex7.createTexture("textures/7.tga");
+    tex8.createTexture("textures/8.tga");
+    tex9.createTexture("textures/9.tga");
+    tex10.createTexture("textures/10.tga");
+    tex11.createTexture("textures/11.tga");
+    tex12.createTexture("textures/12.tga");
+    tex13.createTexture("textures/13.tga");
+    tex14.createTexture("textures/14.tga");
+    tex15.createTexture("textures/15.tga");
+
 
     //Skicka variabler till shaders
 	location_time = glGetUniformLocation(myShader.programID, "time");
@@ -143,7 +163,12 @@ int main(int argc, char *argv[]) {
 
     glfwSwapInterval(0); // Do not wait for screen refresh between frames
 
-     myShape.printInfo();
+     sphere1.printInfo();
+
+     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+     glEnable(GL_CULL_FACE);
+     glEnable(GL_DEPTH_TEST);
+
 
     // Main loop
     while(!glfwWindowShouldClose(window))
@@ -160,8 +185,7 @@ int main(int argc, char *argv[]) {
 		// Set the clear color and depth, and clear the buffers for drawing
         glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
+
 
         //Interaction, Camera
         myMouseRotator.poll(window);
@@ -170,6 +194,7 @@ int main(int argc, char *argv[]) {
         Utilities::mat4roty(Ty, myMouseRotator.phi);
         Utilities::mat4translate(Tt, myKeyTranslator.tran_x, myKeyTranslator.tran_y, myKeyTranslator.tran_z-3.0);
 
+
         //MV Controls the camera, FPS-style
         //I ordning: Translatera från origo, rotera, translatera med knappar
         Utilities::mat4mult(Tx,Ty,MV);
@@ -177,24 +202,28 @@ int main(int argc, char *argv[]) {
         Utilities::mat4mult(Tt,MV,MV);
 
 
+
         /* ---- Rendering code should go here ---- */
         time = (float)glfwGetTime();    //Number of seconds since program started
         glUseProgram(myShader.programID);   //Activate the shader to set its variable
         glUniform1f(location_time, time); //Copy value to shader
-        glUniform1i(location_tex, time);
+        glUniform1i(location_tex, 0);
 
         //Send projection and modelview matrices
         glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
-        //Send to shaders and render for object 1
-        myShape.setMatrices();
-        myShape.render();
 
         //Textures for object 1
 
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glUseProgram(0);
+        glBindTexture(GL_TEXTURE_2D, tex1.textureID);
+
+        //Send to shaders and render for object 1
+        sphere1.setMatrices();
+        sphere1.render();
+
+        sphere0.render();
+
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
         glfwSwapBuffers(window);

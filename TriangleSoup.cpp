@@ -721,9 +721,9 @@ void TriangleSoup::render() {
 	//setMatrices();
 
 	glBindVertexArray(vao);
-	//glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
 	//glDrawArraysInstanced(GL_TRIANGLES, 0, 3*ntris, 16); //Instancing
-	glDrawElementsInstanced(GL_TRIANGLES, 3*ntris, GL_UNSIGNED_INT, 0, 16); //Instancing
+	//glDrawElementsInstanced(GL_TRIANGLES, 3*ntris, GL_UNSIGNED_INT, 0, 16); //Instancing
 	glBindVertexArray(0);
 }
 

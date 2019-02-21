@@ -14,18 +14,21 @@
 //uniform float time;
 
 in vec3 N;
+in vec2 st;
 
 out vec4 finalcolor;
+uniform sampler2D tex;
 
 void main() {
 
-    vec3 ka = vec3(0.0, 1.0, 1.0);
-    vec3 Ia = vec3(1.0, 0.5, 0);
-    vec3 kd = vec3(1.0, 1.0, 0);
-    vec3 Id = vec3(1.0, 0, 0);
-    vec3 ks = vec3(1.0, 1.0, 1.0);
+    vec3 ka = vec3(0.5, 0.5, 0.5);
+    vec3 Ia = vec3(0.2, 0.2, 0.2);
+    vec3 kd = texture(tex, st).rgb;
+    //vec3 kd = vec3(1.0, 1.0, 0.0);
     vec3 Is = vec3(1.0, 1.0, 1.0);
-    
+    vec3 Id = vec3(1.0,1.0,1.0);
+    vec3 ks = vec3(1.0, 1.0, 1.0);
+
     float n = 5;
 
     vec3 V = normalize(vec3(0.0, 0.0, -3.0));
@@ -39,4 +42,5 @@ void main() {
     }
     vec3 shadedColor = Ia*ka + Id*kd*dotNL + Is*ks*pow(dotRV, n);
     finalcolor = vec4(shadedColor, 1.0);
+
 }

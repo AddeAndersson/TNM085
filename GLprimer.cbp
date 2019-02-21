@@ -25,6 +25,15 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-DGLEW_STATIC" />
+		</Compiler>
+		<Linker>
+			<Add library="glew32s" />
+			<Add library="glu32" />
+			<Add library="opengl32" />
+			<Add directory="D:/Skola/Modelleringsprojekt(TNM085)/TNM085/glew/lib/Release/Win32" />
+		</Linker>
 		<Unit filename="Ball.cpp" />
 		<Unit filename="Ball.hpp" />
 		<Unit filename="GLprimer.cpp" />
