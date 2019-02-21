@@ -2,7 +2,6 @@
 glm::vec2 *getStartPos(glm::vec2 startPositions[]);
 void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y);
 glm::vec2 *startVelocities(glm::vec2 velocities[]);
-float time = (float)glfwGetTime();
 
 /* Constructor: initialize a TriangleSoup object to all zeros */
 TriangleSoup::TriangleSoup() {
@@ -107,12 +106,9 @@ void TriangleSoup::createTriangle() {
 	// Not normalized (GL_FALSE)
 	// Stride 8 floats (interleaved array with 8 floats per vertex)
 	// Array buffer offset 0, 3 or 6 floats (offset into first vertex)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-		8*sizeof(GLfloat), (void*)0); // xyz coordinates
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-		8*sizeof(GLfloat), (void*)(3*sizeof(GLfloat))); // normals
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
-		8*sizeof(GLfloat), (void*)(6*sizeof(GLfloat))); // texcoords
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)0); // xyz coordinates
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(3*sizeof(GLfloat))); // normals
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(6*sizeof(GLfloat))); // texcoords
 
  	// Activate the index buffer
  	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
@@ -244,9 +240,9 @@ void TriangleSoup::createSphere(float radius, int segments) {
 	double theta, phi;
 	int vsegs, hsegs;
 	int stride = 8;
-	glm::vec2 startPositions[16];
+	//glm::vec2 startPositions[16];
 
-	getStartPos(startPositions);
+	//getStartPos(startPositions);
 
 	//Refactor later
     /*glm::mat4 *modelMatrices;
@@ -347,11 +343,11 @@ void TriangleSoup::createSphere(float radius, int segments) {
 	}
 
     /*Store INSTANCE DATA*/
-    unsigned int instanceVBO;
+    /*unsigned int instanceVBO;
     glGenBuffers(1, &instanceVBO);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 16, &startPositions[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 
 
 	// Generate one vertex array object (VAO) and bind it
@@ -388,11 +384,11 @@ void TriangleSoup::createSphere(float radius, int segments) {
  	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ntris*sizeof(GLuint), indexarray, GL_STATIC_DRAW);
 
     //Also set INSTANCE
-    glEnableVertexAttribArray(3);
+    /*glEnableVertexAttribArray(3);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
     glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor(3, 1); // tell OpenGL this is an instanced vertex attribute.
+    glVertexAttribDivisor(3, 1);*/ // tell OpenGL this is an instanced vertex attribute.
 
     //Matrices for translation/rotation
     /*unsigned int buffer;
@@ -415,9 +411,9 @@ void TriangleSoup::createSphere(float radius, int segments) {
 	// Deactivate (unbind) the VAO and the buffers again.
 	// Do NOT unbind the buffers while the VAO is still bound.
 	// The index buffer is an essential part of the VAO state.
-	/*glBindVertexArray(0);
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
- 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
+ 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 }
 
@@ -682,15 +678,24 @@ void TriangleSoup::printInfo() {
 
 void TriangleSoup::setMatrices() {
 
+
     //Refactor later
     glm::mat4 *modelMatrices;
+    glm::vec2 velocities[16];
+
+	startVelocities(velocities);
     modelMatrices = new glm::mat4[16];
     //Initialize matrices with random values for testing
+
+
     for(unsigned int n = 0; n < 16; ++n){
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        //model = glm::translate(glm::mat4(1.0f), glm::vec3(time, 0.0f, 0.0f));
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
+
         modelMatrices[n] = model;
     }
+
 
     //Matrices for translation/rotation
     unsigned int buffer;
@@ -713,6 +718,9 @@ void TriangleSoup::setMatrices() {
     glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
  	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    delete[] modelMatrices;
+
 }
 
 /* Render the geometry in a TriangleSoup object */
@@ -721,9 +729,9 @@ void TriangleSoup::render() {
 	//setMatrices();
 
 	glBindVertexArray(vao);
-	//glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
 	//glDrawArraysInstanced(GL_TRIANGLES, 0, 3*ntris, 16); //Instancing
-	glDrawElementsInstanced(GL_TRIANGLES, 3*ntris, GL_UNSIGNED_INT, 0, 16); //Instancing
+	//glDrawElementsInstanced(GL_TRIANGLES, 3*ntris, GL_UNSIGNED_INT, 0, 16); //Instancing
 	glBindVertexArray(0);
 }
 

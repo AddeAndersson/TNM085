@@ -40,8 +40,11 @@
 #include "Rotator.hpp"
 
 //Declarations
-
-
+void updateAndRender(float x, float y);
+GLfloat T[16]; //Object Matrix
+GLfloat Trot[16]; //Object Rotation
+GLint location_T; //Object translations
+TriangleSoup myShape;
 
 /*
  * main(argc, argv) - the standard C++ entry point for the program
@@ -59,11 +62,11 @@ int main(int argc, char *argv[]) {
     GLfloat P[16]; //Perspective
     GLfloat MV[16]; //Modelview matrix
 
+    //Animation matrices
     GLint location_P;
     GLint location_MV;
     float time;
     GLint location_time;
-    TriangleSoup myShape;
 
     MouseRotator myMouseRotator;
     KeyTranslator myKeyTranslator;
@@ -74,10 +77,6 @@ int main(int argc, char *argv[]) {
     //Constant Matrices (Not animated)
     Utilities::mat4perspective(P, M_PI/4, 1, 0.1, 100.0);
     Utilities::mat4translate(T2, 0.0, 0.0, -2.0);
-    //Utilities::mat4translate(MV, 0.0, 0.0, 0.0);
-
-    //Utilities::mat4mult(T, T2, T);*/
-    //Utilities::mat4print(T);
 
     const GLFWvidmode *vidmode;  // GLFW struct to hold information about the display
 	GLFWwindow *window;    // GLFW struct to hold information about the window
@@ -116,7 +115,7 @@ int main(int argc, char *argv[]) {
     Utilities::loadExtensions();
 
     //Create objects here
-    myShape.createSphere(0.0286f, 6);
+    myShape.createSphere(0.0286f, 32);
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
@@ -128,6 +127,9 @@ int main(int argc, char *argv[]) {
 	}
 	location_P = glGetUniformLocation(myShader.programID, "P");
 	location_MV = glGetUniformLocation(myShader.programID, "MV");
+	location_T = glGetUniformLocation(myShader.programID, "T");
+
+
 
 
     // Show some useful information on the GL context
@@ -138,7 +140,7 @@ int main(int argc, char *argv[]) {
 
     glfwSwapInterval(0); // Do not wait for screen refresh between frames
 
-     myShape.printInfo();
+    myShape.printInfo();
 
     // Main loop
     while(!glfwWindowShouldClose(window))
@@ -181,9 +183,10 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
-        //Send to shaders and render for object 1
-        myShape.setMatrices();
-        myShape.render();
+        //Render 16 objects
+        for(unsigned int i = 0; i < 16; ++i){
+            updateAndRender(time, 0.0f);
+        }
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
         glfwSwapBuffers(window);
@@ -205,3 +208,10 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+void updateAndRender(float x, float y){
+    Utilities::mat4rotz(Trot, 0.0f);
+    Utilities::mat4translate(T, x, y, 0.0f);
+    Utilities::mat4mult(T, Trot, T);
+    glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
+    myShape.render();
+}
