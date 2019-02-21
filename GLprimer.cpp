@@ -38,6 +38,7 @@
 #include "Shader.hpp"
 #include "TriangleSoup.hpp"
 #include "Rotator.hpp"
+#include "Texture.hpp"
 
 //Declarations
 void updateAndRender(float x, float y);
@@ -67,12 +68,11 @@ int main(int argc, char *argv[]) {
     GLint location_MV;
     float time;
     GLint location_time;
+    Texture tex1;
+    GLint location_tex;
 
     MouseRotator myMouseRotator;
     KeyTranslator myKeyTranslator;
-
-    Ball myBall = Ball(0.0, 0.0, 1.0, 6.0, 0.0, 0.0);
-
 
     //Constant Matrices (Not animated)
     Utilities::mat4perspective(P, M_PI/4, 1, 0.1, 100.0);
@@ -119,6 +119,10 @@ int main(int argc, char *argv[]) {
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
+
+    //Create textures
+    location_tex = glGetUniformLocation(myShader.programID, "tex");
+    tex1.createTexture("textures/1.tga");
 
     //Skicka variabler till shaders
 	location_time = glGetUniformLocation(myShader.programID, "time");
@@ -178,6 +182,7 @@ int main(int argc, char *argv[]) {
         time = (float)glfwGetTime();    //Number of seconds since program started
         glUseProgram(myShader.programID);   //Activate the shader to set its variable
         glUniform1f(location_time, time); //Copy value to shader
+        glUniform1i(location_tex, time);
 
         //Send projection and modelview matrices
         glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
@@ -187,6 +192,11 @@ int main(int argc, char *argv[]) {
         for(unsigned int i = 0; i < 16; ++i){
             updateAndRender(time, 0.0f);
         }
+
+        //Textures for object 1
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glUseProgram(0);
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
         glfwSwapBuffers(window);
