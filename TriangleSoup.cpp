@@ -1,7 +1,9 @@
 #include "TriangleSoup.hpp"
+
 //glm::vec2 *getStartPos(glm::vec2 startPositions[]);
+
 void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y);
-glm::vec2 *startVelocities(glm::vec2 velocities[]);
+//glm::vec2 *startVelocities(glm::vec2 velocities[]);
 
 /* Constructor: initialize a TriangleSoup object to all zeros */
 TriangleSoup::TriangleSoup() {
@@ -681,7 +683,7 @@ void TriangleSoup::setMatrices() {
     glm::mat4 *modelMatrices;
     glm::vec2 velocities[16];
 
-	startVelocities(velocities);
+	//startVelocities(velocities);
     modelMatrices = new glm::mat4[16];
     //Initialize matrices with random values for testing
 
@@ -769,20 +771,10 @@ glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
     return startPositions;
 }*/
 
+
 void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y) {
     velocities[index].x = vel_x;
     velocities[index].y = vel_y;
 }
 
-glm::vec2 *startVelocities(glm::vec2 velocities[]){
-    //glm::vec2 startPositions[17]; //16 Balls
-    for(int i = 1; i < 16; ++i){
-        velocities[i].x = 0.0f;
-        velocities[i].y = 0.0f;
-    }
 
-    velocities[0].x = 19.0f;
-    velocities[0].y = 0.0f;
-
-    return velocities;
-}

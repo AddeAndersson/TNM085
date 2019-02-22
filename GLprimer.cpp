@@ -43,7 +43,11 @@
 
 //Declarations
 void updateAndRender(float x, float y);
-glm::vec2 *getStartPos(glm::vec2 startPositions[]);
+glm::vec2 *getBallPos(glm::vec2 ballPositions[]);
+glm::vec2 *startVelocities(glm::vec2 ballVelocities[]);
+void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]);
+void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]);
+
 GLfloat T[16]; //Object Matrix
 GLfloat Trot[16]; //Object Rotation
 GLfloat Trot1[16];
@@ -68,9 +72,13 @@ int main(int argc, char *argv[]) {
     GLfloat P[16]; //Perspective
     GLfloat MV[16]; //Modelview matrix
 
-    //Start positions
-    glm::vec2 startPositions[16];
-    getStartPos(startPositions);
+    float dt;
+
+    //Start positions and start velocities
+    glm::vec2 ballPositions[16];
+    glm::vec2 ballVelocities[16];
+    getBallPos(ballPositions);
+    startVelocities(ballVelocities);
 
     //Animation matrices
     GLint location_P;
@@ -123,7 +131,6 @@ int main(int argc, char *argv[]) {
     //Initiate interactions
     myMouseRotator.init(window);
     myKeyTranslator.init(window);
-
 
     Utilities::loadExtensions();
 
@@ -181,6 +188,8 @@ int main(int argc, char *argv[]) {
     myShape.printInfo();
     poolTable.printInfo();
 
+    float prev_time = 0.0f;
+
     // Main loop
     while(!glfwWindowShouldClose(window))
     {
@@ -224,17 +233,26 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
+        ballToBorderCollision(ballPositions, ballVelocities);
+        ballToBallCollision(ballPositions, ballVelocities);
+
+        dt = time - prev_time; //Time passed since last iteration
+
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
-
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
-
-            updateAndRender(startPositions[i].x, startPositions[i].y);
+            ballPositions[i] += ballVelocities[i]*dt;
+            updateAndRender(ballPositions[i].x, ballPositions[i].y);
         }
 
         //Render Table
 
         poolTable.render();
+
+        prev_time = time;
+
+        //Textures for object 1
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         glUseProgram(0);
 
@@ -259,37 +277,147 @@ int main(int argc, char *argv[]) {
 }
 
 void updateAndRender(float x, float y){
-    Utilities::mat4rotz(Trot, 0.0f);
-    Utilities::mat4rotx(Trot1, 0.8f);
-    Utilities::mat4mult(Trot1, Trot, Trot);
+
+
+    //Utilities::mat4rotx(Trot1, 0.8f);
+    //Utilities::mat4mult(Trot1, Trot, Trot);
+
     Utilities::mat4translate(T, x, y, 0.0f);
     Utilities::mat4mult(T, Trot, T);
     glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
     myShape.render();
 }
 
-glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
+glm::vec2 *getBallPos(glm::vec2 ballPositions[]) {
 
     float k = 0.014;
 
-    //glm::vec2 startPositions[17]; //16 Balls
+    //glm::vec2 ballPositions[17]; //16 Balls
 
-    startPositions[0].x = (float)0.5325;       startPositions[0].y = (float)0.5325;
-    startPositions[1].x = (float)1.5975-2*k;   startPositions[1].y = (float)0.5325;
-    startPositions[2].x = (float)1.6470-k;     startPositions[2].y = (float)0.5039-k;
-    startPositions[3].x = (float)1.6470-k;     startPositions[3].y = (float)0.5611+k;
-    startPositions[4].x = (float)1.6965;       startPositions[4].y = (float)0.4753-k;
-    startPositions[5].x = (float)1.6965;       startPositions[5].y = (float)0.5325;
-    startPositions[6].x = (float)1.6965;       startPositions[6].y = (float)0.5897+k;
-    startPositions[7].x = (float)1.7460+k;     startPositions[7].y = (float)0.4467-2*k;
-    startPositions[8].x = (float)1.7460+k;     startPositions[8].y = (float)0.5039-k;
-    startPositions[9].x = (float)1.7460+k;     startPositions[9].y = (float)0.5611+k;
-    startPositions[10].x = (float)1.7460+k;    startPositions[10].y = (float)0.6183+2*k;
-    startPositions[11].x = (float)1.7955+2*k;  startPositions[11].y = (float)0.4181-2*k;
-    startPositions[12].x = (float)1.7955+2*k;  startPositions[12].y = (float)0.4753-k;
-    startPositions[13].x = (float)1.7955+2*k;  startPositions[13].y = (float)0.5325;
-    startPositions[14].x = (float)1.7955+2*k;  startPositions[14].y = (float)0.5897+2*k;
-    startPositions[15].x = (float)1.7955+2*k;  startPositions[15].y = (float)0.6469+2*k;
+    ballPositions[0].x = (float)0.5325;       ballPositions[0].y = (float)0.5325;
+    ballPositions[1].x = (float)1.5975-2*k;   ballPositions[1].y = (float)0.5325;
+    ballPositions[2].x = (float)1.6470-k;     ballPositions[2].y = (float)0.5039-k;
+    ballPositions[3].x = (float)1.6470-k;     ballPositions[3].y = (float)0.5611+k;
+    ballPositions[4].x = (float)1.6965;       ballPositions[4].y = (float)0.4753-k;
+    ballPositions[5].x = (float)1.6965;       ballPositions[5].y = (float)0.5325;
+    ballPositions[6].x = (float)1.6965;       ballPositions[6].y = (float)0.5897+k;
+    ballPositions[7].x = (float)1.7460+k;     ballPositions[7].y = (float)0.4467-2*k;
+    ballPositions[8].x = (float)1.7460+k;     ballPositions[8].y = (float)0.5039-k;
+    ballPositions[9].x = (float)1.7460+k;     ballPositions[9].y = (float)0.5611+k;
+    ballPositions[10].x = (float)1.7460+k;    ballPositions[10].y = (float)0.6183+2*k;
+    ballPositions[11].x = (float)1.7955+2*k;  ballPositions[11].y = (float)0.4181-2*k;
+    ballPositions[12].x = (float)1.7955+2*k;  ballPositions[12].y = (float)0.4753-k;
+    ballPositions[13].x = (float)1.7955+2*k;  ballPositions[13].y = (float)0.5325;
+    ballPositions[14].x = (float)1.7955+2*k;  ballPositions[14].y = (float)0.5897+2*k;
+    ballPositions[15].x = (float)1.7955+2*k;  ballPositions[15].y = (float)0.6469+2*k;
 
-    return startPositions;
+    return ballPositions;
+}
+
+glm::vec2 *startVelocities(glm::vec2 ballVelocities[]){
+    //glm::vec2 ballPositions[17]; //16 Balls
+    for(int i = 1; i < 16; ++i){
+        ballVelocities[i].x = 0.0f;
+        ballVelocities[i].y = 0.0f;
+    }
+
+    ballVelocities[0].x = 1.0f;
+    ballVelocities[0].y = 0.0f;
+
+    return ballVelocities;
+}
+
+/*----------------------------------/
+/        ballToBallCollision        /
+/----------------------------------*/
+
+void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
+    // Auxiliary variables
+    glm::vec2 temp;
+
+    // temp variables to store constants
+    float C1,C2,m1,m2,norm;
+    float r = 0.0286;
+    float massWhiteBall = 0.170;
+    float massRestOfBalls = 0.165;
+
+    for(int i = 0; i < 15; ++i){
+        for(int  j = 1; j < 16; j++){
+
+            if(i == j){
+                break;
+            }
+            if( i == 0){
+                m1 = massWhiteBall;
+                m2 = massRestOfBalls;
+            }
+            else{
+                m1 = m2 = massRestOfBalls;
+            }
+
+
+            norm = distance(ballPos[i], ballPos[j]);
+
+            // Check for collision
+            if(norm  <= 2*r){
+
+                temp = ballPos[i] - ballPos[j];
+                float length = sqrt(pow(temp.x,2) + pow(temp.y,2));
+
+                // compute new direction
+                C1 = (2*m2/(m1+m2))*dot((ballVel[i]-ballVel[j]) , (ballPos[i] - ballPos[j]))/pow(length,2);
+                C2 = (2*m1/(m1+m2))*dot((ballVel[j]-ballVel[i]) , (ballPos[j] - ballPos[i]))/pow(length,2);
+
+                //cout << C1 << " " << C2 << endl;
+
+                // Update velocities
+                ballVel[i] = ballVel[i] - C1*(ballPos[i] - ballPos[j]);
+                ballVel[j] = ballVel[j] - C2*(ballPos[j] - ballPos[i]);
+            }
+        }
+    }
+}
+
+/*----------------------------------/
+/        ballToBorderCollision      /
+/----------------------------------*/
+
+void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
+
+    for(int i = 0; i < 16; i++){
+
+        // Separating factor sep. Used in MatLab to avoid balls sticking to
+        // eachother. Maybe not needed in c++/openGL
+        float sep = 10^-3;
+
+        // Table properties
+        float xMaxLengthTable = 2.13;
+        float xMinLengthTable = 0;
+
+        float yMaxLengthTable = 1.065;
+        float yMinLengthTable = 0;
+
+        // Ball properties, r = radius;
+        float r = 0.0286;
+
+        //check if particles collided with the walls horizontally (x-direction)
+        if ( ballPos[i].x + r >= xMaxLengthTable || ballPos[i].x - r <=  xMinLengthTable){
+
+            // Formula to calculate velocity drop.
+            ballVel[i].x = sqrt( pow(0.75*(ballVel[i].x ),2));
+            // New direction
+            ballVel[i].x = -ballVel[i].x;
+
+        }
+
+        // check if particles collided with the walls vertically (y-direction)
+        if( ballPos[i].y + r >= yMaxLengthTable || ballPos[i].y  - r <= yMinLengthTable){
+
+            // Formula to calculate velocity drop.
+            ballVel[i].y = sqrt(pow(0.75*(ballVel[i].y ),2));
+
+            // New direction
+            ballVel[i].y  = -ballVel[i].y;
+        }
+    }
 }
