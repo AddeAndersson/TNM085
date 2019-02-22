@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
 
     Texture tex0, tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
-    tex10, tex11, tex12, tex13, tex14, tex15;
+    tex10, tex11, tex12, tex13, tex14, tex15, texBord;
 
     GLint location_tex;
 
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
 
     //Create objects here
     myShape.createSphere(0.0286f, 32);
-    poolTable.readOBJ("PoolTable/PoolTable.obj");
+    poolTable.readOBJ("PoolTable/PoolTable2.obj");
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
@@ -162,6 +162,8 @@ int main(int argc, char *argv[]) {
     tex13.createTexture("textures/Ball13.tga");     tex[13] = tex13;
     tex14.createTexture("textures/Ball14.tga");     tex[14] = tex14;
     tex15.createTexture("textures/Ball15.tga");     tex[15] = tex15;
+
+    texBord.createTexture("textures/Bord.tga");
 
     //Skicka variabler till shaders
 	location_time = glGetUniformLocation(myShader.programID, "time");
@@ -261,6 +263,7 @@ int main(int argc, char *argv[]) {
         Utilities::mat4translate(T, 1.065f, 0.5325f+0.05f, -0.800f);
         Utilities::mat4mult(T, Trot, T);
         glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
+        glBindTexture(GL_TEXTURE_2D, texBord.textureID);
         poolTable.render();
 
         //Textures for object 1
