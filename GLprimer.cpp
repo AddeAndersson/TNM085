@@ -47,10 +47,11 @@ glm::vec2 *getBallPos(glm::vec2 ballPositions[]);
 glm::vec2 *startVelocities(glm::vec2 ballVelocities[]);
 void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]);
 void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]);
+void updateTransFriction(glm::vec2 ballVelocities[], float dt);
 
 GLfloat T[16]; //Object Matrix
 GLfloat Trot[16]; //Object Rotation
-GLfloat Trot1[16];
+//GLfloat Trot1[16];
 GLint location_T; //Object translations
 TriangleSoup myShape;
 TriangleSoup poolTable;
@@ -67,6 +68,7 @@ int main(int argc, char *argv[]) {
 	int width, height;
     Shader myShader;
     GLfloat Tt[16]; GLfloat Tx[16]; //Temporary matrices
+    GLfloat T_table[16];
     GLfloat Ty[16]; //Temporary matrices
     GLfloat T2[16]; //Part of MV mat
     GLfloat P[16]; //Perspective
@@ -88,7 +90,7 @@ int main(int argc, char *argv[]) {
 
 
     Texture tex0, tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
-    tex10, tex11, tex12, tex13, tex14, tex15;
+    tex10, tex11, tex12, tex13, tex14, tex15, texBord;
 
     GLint location_tex;
 
@@ -116,7 +118,7 @@ int main(int argc, char *argv[]) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // Open a square window (aspect 1:1) to fill half the screen height
-    window = glfwCreateWindow(vidmode->height/2, vidmode->height/2, "GLprimer", NULL, NULL);
+    window = glfwCreateWindow(vidmode->height, vidmode->height, "GLprimer", NULL, NULL);
     if (!window)
     {
         cout << "Unable to open window. Terminating." << endl;
@@ -136,7 +138,7 @@ int main(int argc, char *argv[]) {
 
     //Create objects here
     myShape.createSphere(0.0286f, 32);
-    poolTable.readOBJ("PoolTable/PoolTable.obj");
+    poolTable.readOBJ("PoolTable/PoolTable2.obj");
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
@@ -161,6 +163,8 @@ int main(int argc, char *argv[]) {
     tex14.createTexture("textures/Ball14.tga");     tex[14] = tex14;
     tex15.createTexture("textures/Ball15.tga");     tex[15] = tex15;
 
+    texBord.createTexture("textures/Bord.tga");
+
     //Skicka variabler till shaders
 	location_time = glGetUniformLocation(myShader.programID, "time");
 	if(location_time == -1) {
@@ -169,8 +173,6 @@ int main(int argc, char *argv[]) {
 	location_P = glGetUniformLocation(myShader.programID, "P");
 	location_MV = glGetUniformLocation(myShader.programID, "MV");
 	location_T = glGetUniformLocation(myShader.programID, "T");
-
-
 
 
     // Show some useful information on the GL context
@@ -193,6 +195,9 @@ int main(int argc, char *argv[]) {
     // Main loop
     while(!glfwWindowShouldClose(window))
     {
+
+
+
         // Get window size. It may start out different from the requested
         // size, and will change if the user resizes the window.
         glfwGetWindowSize( window, &width, &height );
@@ -212,7 +217,7 @@ int main(int argc, char *argv[]) {
         myKeyTranslator.poll(window);
         Utilities::mat4rotx(Tx, myMouseRotator.theta);
         Utilities::mat4roty(Ty, myMouseRotator.phi);
-        Utilities::mat4translate(Tt, myKeyTranslator.tran_x, myKeyTranslator.tran_y, myKeyTranslator.tran_z-3.0);
+        Utilities::mat4translate(Tt, myKeyTranslator.tran_x-1.465f, myKeyTranslator.tran_y, myKeyTranslator.tran_z-3.0);
 
 
         //MV Controls the camera, FPS-style
@@ -233,10 +238,14 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
+
         ballToBorderCollision(ballPositions, ballVelocities);
         ballToBallCollision(ballPositions, ballVelocities);
 
         dt = time - prev_time; //Time passed since last iteration
+       // Friction
+        updateTransFriction(ballVelocities, dt);
+
 
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
@@ -245,11 +254,17 @@ int main(int argc, char *argv[]) {
             updateAndRender(ballPositions[i].x, ballPositions[i].y);
         }
 
+        prev_time = time; //Set previous time to current time
+
         //Render Table
-
+        Utilities::mat4rotx(T_table, M_PI/2);
+        Utilities::mat4scale(Trot, 0.03f);
+        Utilities::mat4mult(T_table, Trot, Trot);
+        Utilities::mat4translate(T, 1.065f, 0.5325f+0.05f, -0.800f);
+        Utilities::mat4mult(T, Trot, T);
+        glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
+        glBindTexture(GL_TEXTURE_2D, texBord.textureID);
         poolTable.render();
-
-        prev_time = time;
 
         //Textures for object 1
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -277,11 +292,9 @@ int main(int argc, char *argv[]) {
 }
 
 void updateAndRender(float x, float y){
-
-
     //Utilities::mat4rotx(Trot1, 0.8f);
     //Utilities::mat4mult(Trot1, Trot, Trot);
-
+    Utilities::mat4rotx(Trot, 0.0f);
     Utilities::mat4translate(T, x, y, 0.0f);
     Utilities::mat4mult(T, Trot, T);
     glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
@@ -291,8 +304,6 @@ void updateAndRender(float x, float y){
 glm::vec2 *getBallPos(glm::vec2 ballPositions[]) {
 
     float k = 0.014;
-
-    //glm::vec2 ballPositions[17]; //16 Balls
 
     ballPositions[0].x = (float)0.5325;       ballPositions[0].y = (float)0.5325;
     ballPositions[1].x = (float)1.5975-2*k;   ballPositions[1].y = (float)0.5325;
@@ -321,7 +332,7 @@ glm::vec2 *startVelocities(glm::vec2 ballVelocities[]){
         ballVelocities[i].y = 0.0f;
     }
 
-    ballVelocities[0].x = 1.0f;
+    ballVelocities[0].x = 3.0f;
     ballVelocities[0].y = 0.0f;
 
     return ballVelocities;
@@ -330,7 +341,6 @@ glm::vec2 *startVelocities(glm::vec2 ballVelocities[]){
 /*----------------------------------/
 /        ballToBallCollision        /
 /----------------------------------*/
-
 void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
     // Auxiliary variables
     glm::vec2 temp;
@@ -340,13 +350,14 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
     float r = 0.0286;
     float massWhiteBall = 0.170;
     float massRestOfBalls = 0.165;
+    float sep = 0;
+
+    // distance + separation
+    float l = 2*r + sep;
 
     for(int i = 0; i < 15; ++i){
-        for(int  j = 1; j < 16; j++){
+        for(int  j = i+1; j < 16; j++){
 
-            if(i == j){
-                break;
-            }
             if( i == 0){
                 m1 = massWhiteBall;
                 m2 = massRestOfBalls;
@@ -355,11 +366,10 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
                 m1 = m2 = massRestOfBalls;
             }
 
-
             norm = distance(ballPos[i], ballPos[j]);
 
             // Check for collision
-            if(norm  <= 2*r){
+            if(norm  <= l){
 
                 temp = ballPos[i] - ballPos[j];
                 float length = sqrt(pow(temp.x,2) + pow(temp.y,2));
@@ -367,8 +377,6 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
                 // compute new direction
                 C1 = (2*m2/(m1+m2))*dot((ballVel[i]-ballVel[j]) , (ballPos[i] - ballPos[j]))/pow(length,2);
                 C2 = (2*m1/(m1+m2))*dot((ballVel[j]-ballVel[i]) , (ballPos[j] - ballPos[i]))/pow(length,2);
-
-                //cout << C1 << " " << C2 << endl;
 
                 // Update velocities
                 ballVel[i] = ballVel[i] - C1*(ballPos[i] - ballPos[j]);
@@ -381,43 +389,83 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 /*----------------------------------/
 /        ballToBorderCollision      /
 /----------------------------------*/
-
 void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 
     for(int i = 0; i < 16; i++){
 
-        // Separating factor sep. Used in MatLab to avoid balls sticking to
-        // eachother. Maybe not needed in c++/openGL
-        float sep = 10^-3;
-
         // Table properties
         float xMaxLengthTable = 2.13;
         float xMinLengthTable = 0;
-
+        float sep = 1e-3;
         float yMaxLengthTable = 1.065;
         float yMinLengthTable = 0;
 
         // Ball properties, r = radius;
         float r = 0.0286;
 
-        //check if particles collided with the walls horizontally (x-direction)
-        if ( ballPos[i].x + r >= xMaxLengthTable || ballPos[i].x - r <=  xMinLengthTable){
+        // Check if particles collided with the walls horizontally (x-direction)
+          if ( ballPos[i].x + r >= xMaxLengthTable - sep ){
 
-            // Formula to calculate velocity drop.
-            ballVel[i].x = sqrt( pow(0.75*(ballVel[i].x ),2));
-            // New direction
-            ballVel[i].x = -ballVel[i].x;
-
+            // Formula to calculate velocity drop and new direction
+            ballVel[i].x = -sqrt(0.75*pow(ballVel[i].x,2));
         }
 
-        // check if particles collided with the walls vertically (y-direction)
-        if( ballPos[i].y + r >= yMaxLengthTable || ballPos[i].y  - r <= yMinLengthTable){
+        if ( ballPos[i].x - r <=  xMinLengthTable + sep ){
 
-            // Formula to calculate velocity drop.
-            ballVel[i].y = sqrt(pow(0.75*(ballVel[i].y ),2));
-
-            // New direction
-            ballVel[i].y  = -ballVel[i].y;
+            // Formula to calculate velocity drop and new direction
+            ballVel[i].x = sqrt(0.75*pow(ballVel[i].x,2));
         }
+
+        if ( ballPos[i].y + r >= yMaxLengthTable - sep ){
+
+            // Formula to calculate velocity drop and new direction
+            ballVel[i].y = -sqrt(0.75*pow(ballVel[i].y,2));
+        }
+
+        if (  ballPos[i].y  - r <= yMinLengthTable + sep  ){
+
+            // Formula to calculate velocity drop and new direction
+            ballVel[i].y = sqrt(0.75*pow(ballVel[i].y,2));
+        }
+    }
+}
+
+/*----------------------------------/
+/             Friction              /
+/----------------------------------*/
+void updateTransFriction(glm::vec2 ballVelocities[], float dt){
+
+    const float EPSILON = 1.0e-5;
+    float m = 0.165;
+    float massWhiteBall = 0.170;
+    glm::vec2 transFriction[16];
+    float my = 0.1; // True friction for trans is 0.2
+
+    for(int i = 0; i < 16; i++){
+
+        //Adjust mass for the white ball
+        if( i == 0 ) m = massWhiteBall;
+
+        // compute friction
+        transFriction[i].x = abs(ballVelocities[i].x*my*dt/m);
+        transFriction[i].y = abs(ballVelocities[i].y*my*dt/m);
+
+        // Determine working direction of the friction (opposite to the velocity).
+        if( ballVelocities[i].x > EPSILON){
+            ballVelocities[i].x = ballVelocities[i].x - transFriction[i].x;
+        }
+
+        if( ballVelocities[i].x < -EPSILON){
+            ballVelocities[i].x = ballVelocities[i].x + transFriction[i].x;
+        }
+
+        if( ballVelocities[i].y > EPSILON){
+            ballVelocities[i].y = ballVelocities[i].y - transFriction[i].y;
+        }
+
+        if( ballVelocities[i].y < -EPSILON){
+            ballVelocities[i].y = ballVelocities[i].y + transFriction[i].y;
+        }
+
     }
 }

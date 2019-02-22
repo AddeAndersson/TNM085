@@ -676,6 +676,7 @@ void TriangleSoup::printInfo() {
      printf("zmax: %8.2f\n", zmax);
 }
 
+/*Not being used*/
 void TriangleSoup::setMatrices() {
 
 
@@ -683,7 +684,6 @@ void TriangleSoup::setMatrices() {
     glm::mat4 *modelMatrices;
     glm::vec2 velocities[16];
 
-	//startVelocities(velocities);
     modelMatrices = new glm::mat4[16];
     //Initialize matrices with random values for testing
 
@@ -725,13 +725,8 @@ void TriangleSoup::setMatrices() {
 
 /* Render the geometry in a TriangleSoup object */
 void TriangleSoup::render() {
-
-	//setMatrices();
-
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 3 * ntris, GL_UNSIGNED_INT, (void*)0);
-	//glDrawArraysInstanced(GL_TRIANGLES, 0, 3*ntris, 16); //Instancing
-	//glDrawElementsInstanced(GL_TRIANGLES, 3*ntris, GL_UNSIGNED_INT, 0, 16); //Instancing
 	glBindVertexArray(0);
 }
 

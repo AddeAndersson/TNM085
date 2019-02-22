@@ -159,7 +159,7 @@
 	<iostream>
 	<cmath>
 
-1550760986 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
+1550843206 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
 	<iostream>
 	<sstream>
 	<string>
@@ -234,7 +234,7 @@
 	<cstring>
 	"Utilities.hpp"
 
-1550744756 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
+1550827772 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
 	"TriangleSoup.hpp"
 
 1550133089 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
