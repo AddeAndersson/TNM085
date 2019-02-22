@@ -1,8 +1,5 @@
 #include "TriangleSoup.hpp"
-<<<<<<< HEAD
-=======
 //glm::vec2 *getStartPos(glm::vec2 startPositions[]);
->>>>>>> dd2ea301bf5c6b2feb0d36b78c894a6a9c54e937
 void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y);
 glm::vec2 *startVelocities(glm::vec2 velocities[]);
 
@@ -744,9 +741,7 @@ void TriangleSoup::render() {
 void TriangleSoup::printError(const char *errtype, const char *errmsg) {
   fprintf(stderr, "%s: %s\n", errtype, errmsg);
 }
-<<<<<<< HEAD
 
-=======
 /*
 glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
 
@@ -773,7 +768,6 @@ glm::vec2 *getStartPos(glm::vec2 startPositions[]) {
 
     return startPositions;
 }*/
->>>>>>> dd2ea301bf5c6b2feb0d36b78c894a6a9c54e937
 
 void updateVelocities(glm::vec2 velocities[], int index, float vel_x, float vel_y) {
     velocities[index].x = vel_x;

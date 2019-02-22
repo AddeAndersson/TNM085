@@ -49,6 +49,7 @@ GLfloat Trot[16]; //Object Rotation
 GLfloat Trot1[16];
 GLint location_T; //Object translations
 TriangleSoup myShape;
+TriangleSoup poolTable;
 Texture tex[16];
 
 /*
@@ -128,6 +129,7 @@ int main(int argc, char *argv[]) {
 
     //Create objects here
     myShape.createSphere(0.0286f, 32);
+    poolTable.readOBJ("PoolTable/PoolTable.obj");
 
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
@@ -177,6 +179,7 @@ int main(int argc, char *argv[]) {
      glEnable(GL_DEPTH_TEST);
 
     myShape.printInfo();
+    poolTable.printInfo();
 
     // Main loop
     while(!glfwWindowShouldClose(window))
@@ -229,8 +232,10 @@ int main(int argc, char *argv[]) {
             updateAndRender(startPositions[i].x, startPositions[i].y);
         }
 
-        //Textures for object 1
-        glBindTexture(GL_TEXTURE_2D, 0);
+        //Render Table
+
+        poolTable.render();
+
         glUseProgram(0);
 
 		// Swap buffers, i.e. display the image and prepare for next frame.
@@ -254,7 +259,7 @@ int main(int argc, char *argv[]) {
 }
 
 void updateAndRender(float x, float y){
-    Utilities::mat4rotz(Trot, (float)glfwGetTime());
+    Utilities::mat4rotz(Trot, 0.0f);
     Utilities::mat4rotx(Trot1, 0.8f);
     Utilities::mat4mult(Trot1, Trot, Trot);
     Utilities::mat4translate(T, x, y, 0.0f);
