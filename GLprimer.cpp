@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
             updateAndRender(ballPositions[i].x, ballPositions[i].y);
         }
 
-        prev_time = time;
+        prev_time = time; //Set previous time to current time
 
         //Textures for object 1
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -345,7 +345,6 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
                 m1 = m2 = massRestOfBalls;
             }
 
-
             norm = distance(ballPos[i], ballPos[j]);
 
             // Check for collision
@@ -357,8 +356,6 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
                 // compute new direction
                 C1 = (2*m2/(m1+m2))*dot((ballVel[i]-ballVel[j]) , (ballPos[i] - ballPos[j]))/pow(length,2);
                 C2 = (2*m1/(m1+m2))*dot((ballVel[j]-ballVel[i]) , (ballPos[j] - ballPos[i]))/pow(length,2);
-
-                //cout << C1 << " " << C2 << endl;
 
                 // Update velocities
                 ballVel[i] = ballVel[i] - C1*(ballPos[i] - ballPos[j]);
