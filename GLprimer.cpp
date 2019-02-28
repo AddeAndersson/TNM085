@@ -43,7 +43,7 @@
 #include "Texture.hpp"
 
 //Declarations
-void updateAndRender(float x, float y);
+void updateAndRender(float x, float y, float x_rot, float y_rot);
 glm::vec2 *getBallPos(glm::vec2 ballPositions[]);
 glm::vec2 *startVelocities(glm::vec2 ballVelocities[]);
 void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]);
@@ -52,10 +52,15 @@ void updateTransFriction(glm::vec2 ballVelocities[], float dt);
 
 GLfloat T[16]; //Object Matrix
 GLfloat Trot[16]; //Object Rotation
+GLfloat Trot_x[16];
+GLfloat Trot_z[16];
+GLfloat Trot_z_i[16];
+float r = 0.0286;
 //GLfloat Trot1[16];
 GLint location_T; //Object translations
 TriangleSoup myShape;
 TriangleSoup poolTable;
+TriangleSoup room;
 Texture tex[16];
 
 /*
@@ -70,19 +75,28 @@ int main(int argc, char *argv[]) {
     Shader myShader;
     GLfloat Tt[16]; GLfloat Tx[16]; //Temporary matrices
     GLfloat T_table[16];
+    GLfloat T_room[16];
     GLfloat Ty[16]; //Temporary matrices
     GLfloat T2[16]; //Part of MV mat
     GLfloat P[16]; //Perspective
     GLfloat MV[16]; //Modelview matrix
+
     bool start = false;
+    GLfloat Prot[16];
+
 
     float dt;
 
     //Start positions and start velocities
     glm::vec2 ballPositions[16];
     glm::vec2 ballVelocities[16];
+    glm::vec2 ballRotations[16];
     getBallPos(ballPositions);
     startVelocities(ballVelocities);
+
+    for(int i = 0; i < 16; ++i){
+        ballRotations[i].x = ballRotations[i].y = 0.0f;
+    }
 
     //Animation matrices
     GLint location_P;
@@ -92,7 +106,7 @@ int main(int argc, char *argv[]) {
 
 
     Texture tex0, tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
-    tex10, tex11, tex12, tex13, tex14, tex15, texBord;
+    tex10, tex11, tex12, tex13, tex14, tex15, texBord, texRum;
 
     GLint location_tex;
 
@@ -100,8 +114,10 @@ int main(int argc, char *argv[]) {
     KeyTranslator myKeyTranslator;
 
     //Constant Matrices (Not animated)
+
     Utilities::mat4perspective(P, M_PI/4, 1.8, 0.1, 100.0);
-    Utilities::mat4translate(T2, 0.0, 0.0, -2.0);
+    Utilities::mat4translate(T2, -1.465f, -0.5, -3.0);
+
 
     const GLFWvidmode *vidmode;  // GLFW struct to hold information about the display
 	GLFWwindow *window;    // GLFW struct to hold information about the window
@@ -141,7 +157,7 @@ int main(int argc, char *argv[]) {
     //Create objects here
     myShape.createSphere(0.0286f, 32);
     poolTable.readOBJ("PoolTable/PoolTable2.obj");
-
+    room.readOBJ("room.obj");
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
 
@@ -166,6 +182,7 @@ int main(int argc, char *argv[]) {
     tex15.createTexture("textures/Ball15.tga");     tex[15] = tex15;
 
     texBord.createTexture("textures/Bord.tga");
+    texRum.createTexture("textures/room.tga");
 
     //Skicka variabler till shaders
 	location_time = glGetUniformLocation(myShader.programID, "time");
@@ -197,14 +214,11 @@ int main(int argc, char *argv[]) {
     // Main loop
     while(!glfwWindowShouldClose(window))
     {
-
-
-
         // Get window size. It may start out different from the requested
         // size, and will change if the user resizes the window.
-        glfwGetWindowSize( window, &width, &height );
+        glfwGetWindowSize(window, &width, &height);
         // Set viewport. This is the pixel rectangle we want to draw into.
-        glViewport( 0, 0, width, height ); // The entire window
+        glViewport(0, 0, width, height ); // The entire window
 
         //Display FPS
         Utilities::displayFPS(window);
@@ -219,15 +233,14 @@ int main(int argc, char *argv[]) {
         myKeyTranslator.poll(window);
         Utilities::mat4rotx(Tx, myMouseRotator.theta);
         Utilities::mat4roty(Ty, myMouseRotator.phi);
-        Utilities::mat4translate(Tt, myKeyTranslator.tran_x-1.465f, myKeyTranslator.tran_y, myKeyTranslator.tran_z-3.0);
+        Utilities::mat4translate(Tt, myKeyTranslator.tran_x, myKeyTranslator.tran_y, myKeyTranslator.tran_z);
 
 
         //MV Controls the camera, FPS-style
         //I ordning: Translatera från origo, rotera, translatera med knappar
         Utilities::mat4mult(Tx,Ty,MV);
         Utilities::mat4mult(MV,T2,MV);
-        Utilities::mat4mult(Tt,MV,MV);
-
+        Utilities::mat4mult(MV,Tt,MV);
 
 
         /* ---- Rendering code should go here ---- */
@@ -245,40 +258,60 @@ int main(int argc, char *argv[]) {
         ballToBallCollision(ballPositions, ballVelocities);
 
         dt = time - prev_time; //Time passed since last iteration
-       // Friction
-        updateTransFriction(ballVelocities, dt);
+
 
         if(GetKeyState('A') == true){
             start = true;
         }
 
 
+        // Friction
+        //updateTransFriction(ballVelocities, dt);
+
+
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
 
+
             if(start == false){
             ballPositions[i];
+            ballRotations[i];
             }
             else{
-            ballPositions[i] += ballVelocities[i]*dt;
+
+            ballPositions[i] += ballVelocities[i]*dt; //dt orsakar kollisionsfel, antagligen pga olika steglängd
+            ballRotations[i] += ballVelocities[i]*dt/r;
             }
-            updateAndRender(ballPositions[i].x, ballPositions[i].y);
+
+            updateAndRender(ballPositions[i].x, ballPositions[i].y, ballRotations[i].x, ballRotations[i].y);
         }
 
         prev_time = time; //Set previous time to current time
 
-        //Render Table
+        // Render Table
         Utilities::mat4rotx(T_table, M_PI/2);
-        Utilities::mat4scale(Trot, 0.03f);
+        Utilities::mat4scale(Trot, 0.0195f);
         Utilities::mat4mult(T_table, Trot, Trot);
-        Utilities::mat4translate(T, 1.065f, 0.5325f+0.05f, -0.800f);
+        Utilities::mat4translate(T, 1.065f, 0.5325f+0.05f, -0.530f);
         Utilities::mat4mult(T, Trot, T);
         glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
         glBindTexture(GL_TEXTURE_2D, texBord.textureID);
         poolTable.render();
 
-        //Textures for object 1
+        //render room
+        Utilities::mat4rotx(T_table, M_PI/2);
+        Utilities::mat4roty(T_room, M_PI/2);
+        Utilities::mat4mult(T_table, T_room, T_table);
+        Utilities::mat4scale(Trot, 0.09f);
+        Utilities::mat4mult(T_table, Trot, Trot);
+        Utilities::mat4translate(T, 3,0,-0.55f);
+        Utilities::mat4mult(T, Trot, T);
+        glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
+        glBindTexture(GL_TEXTURE_2D, texRum.textureID);
+        room.render();
+
+        // Textures for object 1
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glUseProgram(0);
@@ -303,10 +336,23 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void updateAndRender(float x, float y){
-    //Utilities::mat4rotx(Trot1, 0.8f);
-    //Utilities::mat4mult(Trot1, Trot, Trot);
-    Utilities::mat4rotx(Trot, 0.0f);
+void updateAndRender(float x, float y, float x_rot, float y_rot){
+
+    /*Utilities::mat4rotx(Trot_x, -y_rot);
+    Utilities::mat4roty(Trot_z, x_rot);
+    Utilities::mat4mult(Trot_z, Trot_x, Trot);*/
+
+    float angle = x/sqrt(pow(x,2)+pow(y,2));
+    float rot = sqrt(pow(x,2)+pow(y,2))/r;
+
+    Utilities::mat4rotz(Trot_z, angle);
+    Utilities::mat4rotx(Trot_x, -rot);
+    Utilities::mat4rotz(Trot_z_i, -angle);
+
+    Utilities::mat4mult(Trot_x, Trot_z, Trot);
+    Utilities::mat4mult(Trot_z_i, Trot, Trot);
+
+
     Utilities::mat4translate(T, x, y, 0.0f);
     Utilities::mat4mult(T, Trot, T);
     glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
@@ -359,7 +405,6 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 
     // temp variables to store constants
     float C1,C2,m1,m2,norm;
-    float r = 0.0286;
     float massWhiteBall = 0.170;
     float massRestOfBalls = 0.165;
     float sep = 0;
@@ -406,14 +451,14 @@ void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
     for(int i = 0; i < 16; i++){
 
         // Table properties
-        float xMaxLengthTable = 2.13;
-        float xMinLengthTable = 0;
+        float xMaxLengthTable = 2.13+0.1;//+(2.13/2);
+        float xMinLengthTable = 0+0.5;//+(2.13/2);
         float sep = 1e-3;
-        float yMaxLengthTable = 1.065;
-        float yMinLengthTable = 0;
+        float yMaxLengthTable = 1.065-0.125;//+(1.065/2);
+        float yMinLengthTable = 0+0.19;//+(1.065/2);
 
         // Ball properties, r = radius;
-        float r = 0.0286;
+        //float r = 0.0286;
 
         // Check if particles collided with the walls horizontally (x-direction)
           if ( ballPos[i].x + r >= xMaxLengthTable - sep ){
