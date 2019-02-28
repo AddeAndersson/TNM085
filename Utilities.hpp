@@ -16,7 +16,6 @@
 #endif
 
 #include <GLFW/glfw3.h>
-#include "Ball.hpp"
 
 //#include <glm/glm/glm.hpp> //API for use of OpenGL Mathematics
 #include <cstdio>  // For console messages
@@ -112,8 +111,6 @@ void loadExtensions();
  * windows. Call it only for one window, and only once for each frame.
  */
 double displayFPS(GLFWwindow *window);
-
-bool Collide(Ball B1, Ball B2);
 
 }
 

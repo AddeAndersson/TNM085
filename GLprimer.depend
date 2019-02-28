@@ -1530,10 +1530,11 @@
 
 1550229995 d:\skola\modelleringsprojekt(tnm085)\tnm085\glm\glm\simd\integer.h
 
-1550760086 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
+1551345272 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
 	<iostream>
 	<sstream>
 	<string>
+	<Windows.h>
 	<GLFW/glfw3.h>
 	"Utilities.hpp"
 	"Shader.hpp"
@@ -1553,9 +1554,8 @@
 	<GL/gl.h>
 	<GL/glu.h>
 
-1550229994 d:\skola\modelleringsprojekt(tnm085)\tnm085\utilities.hpp
+1551338458 d:\skola\modelleringsprojekt(tnm085)\tnm085\utilities.hpp
 	<GLFW/glfw3.h>
-	"Ball.hpp"
 	<cstdio>
 	<cmath>
 	<GL/glext.h>
@@ -1605,10 +1605,10 @@
 1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\texture.cpp
 	"Texture.hpp"
 
-1550758555 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\trianglesoup.cpp
+1550843902 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\trianglesoup.cpp
 	"TriangleSoup.hpp"
 
-1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\utilities.cpp
+1551338492 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\utilities.cpp
 	"Utilities.hpp"
 	<math.h>
 

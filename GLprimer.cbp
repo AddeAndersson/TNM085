@@ -34,8 +34,6 @@
 			<Add library="opengl32" />
 			<Add directory="D:/Skola/Modelleringsprojekt(TNM085)/TNM085/glew/lib/Release/Win32" />
 		</Linker>
-		<Unit filename="Ball.cpp" />
-		<Unit filename="Ball.hpp" />
 		<Unit filename="GLprimer.cpp" />
 		<Unit filename="Rotator.cpp" />
 		<Unit filename="Rotator.hpp" />

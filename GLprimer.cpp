@@ -24,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <Windows.h>
 
 // In MacOS X, tell GLFW to include the modern OpenGL headers.
 // Windows does not want this, so we make this Mac-only.
@@ -73,6 +74,7 @@ int main(int argc, char *argv[]) {
     GLfloat T2[16]; //Part of MV mat
     GLfloat P[16]; //Perspective
     GLfloat MV[16]; //Modelview matrix
+    bool start = false;
 
     float dt;
 
@@ -98,7 +100,7 @@ int main(int argc, char *argv[]) {
     KeyTranslator myKeyTranslator;
 
     //Constant Matrices (Not animated)
-    Utilities::mat4perspective(P, M_PI/4, 1, 0.1, 100.0);
+    Utilities::mat4perspective(P, M_PI/4, 1.8, 0.1, 100.0);
     Utilities::mat4translate(T2, 0.0, 0.0, -2.0);
 
     const GLFWvidmode *vidmode;  // GLFW struct to hold information about the display
@@ -118,7 +120,7 @@ int main(int argc, char *argv[]) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // Open a square window (aspect 1:1) to fill half the screen height
-    window = glfwCreateWindow(vidmode->height, vidmode->height, "GLprimer", NULL, NULL);
+    window = glfwCreateWindow(1920, 1080, "GLprimer", NULL, NULL);
     if (!window)
     {
         cout << "Unable to open window. Terminating." << endl;
@@ -246,11 +248,21 @@ int main(int argc, char *argv[]) {
        // Friction
         updateTransFriction(ballVelocities, dt);
 
+        if(GetKeyState('A') == true){
+            start = true;
+        }
+
 
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
+
+            if(start == false){
+            ballPositions[i];
+            }
+            else{
             ballPositions[i] += ballVelocities[i]*dt;
+            }
             updateAndRender(ballPositions[i].x, ballPositions[i].y);
         }
 
