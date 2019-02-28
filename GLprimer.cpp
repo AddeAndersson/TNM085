@@ -101,7 +101,6 @@ int main(int argc, char *argv[]) {
     float time;
     GLint location_time;
 
-
     Texture tex0, tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
     tex10, tex11, tex12, tex13, tex14, tex15, texBord, texRum;
 
@@ -264,6 +263,7 @@ int main(int argc, char *argv[]) {
         // Friction
         updateTransFriction(ballVelocities, dt);
 
+
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
@@ -342,21 +342,6 @@ int main(int argc, char *argv[]) {
 
 void updateAndRender(float x, float y, float angle, float rot){
 
-    /*float angle;
-    const float EPS = 1e-5;
-
-    if(ballVelocity.y > EPS && ballVelocity.x > EPS){
-        angle = atan(ballVelocity.y/ballVelocity.x);
-    }
-    else if((ballVelocity.y > EPS && ballVelocity.x < EPS) || (ballVelocity.y < EPS && ballVelocity.x < EPS)){
-        angle = M_PI+atan(ballVelocity.y/ballVelocity.x);
-    }
-    else{
-        angle = 2*M_PI+atan(ballVelocity.y/ballVelocity.x);
-    }
-
-    float rot = sqrt(pow(ballVelocity.x,2)+pow(ballVelocity.y,2))/r;
-    ballRotations[index] += rot*dt;*/
     Utilities::mat4rotz(Trot_z, -angle);
     Utilities::mat4roty(Trot_x, rot);
     Utilities::mat4rotz(Trot_z_i, angle);
