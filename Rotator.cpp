@@ -1,13 +1,13 @@
 #include "Rotator.hpp"
 
 /*
-void KeyRotator::init(GLFWwindow *window) {
+void KeyTranslator::init(GLFWwindow *window) {
      phi = 0.0;
      theta = 0.0;
      lastTime = glfwGetTime();
-};
+}
 
-void KeyRotator::poll(GLFWwindow *window) {
+void KeyTranslator::poll(GLFWwindow *window) {
 
 	double currentTime, elapsedTime;
 
@@ -101,7 +101,7 @@ void MouseRotator::poll(GLFWwindow *window) {
   glfwGetCursorPos(window, &currentX, &currentY);
   currentLeft = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
   currentRight = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
-  glfwGetWindowSize( window, &windowWidth, &windowHeight );
+  glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
   if(currentLeft && lastLeft) { // If a left button drag is in progress
     moveX = currentX - lastX;

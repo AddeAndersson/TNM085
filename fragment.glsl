@@ -29,10 +29,10 @@ void main() {
     vec3 Id = vec3(1.0,1.0,1.0);
     vec3 ks = vec3(1.0, 1.0, 1.0);
 
-    float n = 5;
+    float n = 20;
 
-    vec3 V = normalize(vec3(0.0, 0.0, -3.0));
-    vec3 L = normalize(vec3(1.0, 1.0, 1.0));
+    vec3 V = normalize(vec3(0.0, 0.0, 1.0));
+    vec3 L = normalize(vec3(1.0, 0.0, 1.0));
 
     vec3 R = 2.0*dot(N,L)*N - L;
     float dotNL = max(dot(N,L), 0.0);

@@ -27,6 +27,8 @@ public:
     float tran_x;
     float tran_y;
 	float tran_z;
+	float phi;
+	float theta;
 
 private:
 	double lastTime;

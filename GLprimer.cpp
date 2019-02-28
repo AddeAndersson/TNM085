@@ -24,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <Windows.h>
 
 // In MacOS X, tell GLFW to include the modern OpenGL headers.
 // Windows does not want this, so we make this Mac-only.
@@ -42,7 +43,8 @@
 #include "Texture.hpp"
 
 //Declarations
-void updateAndRender(float x, float y, float x_rot, float y_rot);
+//void updateAndRender(float x, float y, glm::vec2 ballVelocity, int index, float dt);
+void updateAndRender(float x, float y, float angle, float rot);
 glm::vec2 *getBallPos(glm::vec2 ballPositions[]);
 glm::vec2 *startVelocities(glm::vec2 ballVelocities[]);
 void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]);
@@ -55,10 +57,12 @@ GLfloat Trot_x[16];
 GLfloat Trot_z[16];
 GLfloat Trot_z_i[16];
 float r = 0.0286;
+float ballRotations[16] = {0.0f};
 //GLfloat Trot1[16];
 GLint location_T; //Object translations
 TriangleSoup myShape;
 TriangleSoup poolTable;
+TriangleSoup room;
 Texture tex[16];
 
 /*
@@ -73,24 +77,23 @@ int main(int argc, char *argv[]) {
     Shader myShader;
     GLfloat Tt[16]; GLfloat Tx[16]; //Temporary matrices
     GLfloat T_table[16];
+    GLfloat T_room[16];
     GLfloat Ty[16]; //Temporary matrices
     GLfloat T2[16]; //Part of MV mat
     GLfloat P[16]; //Perspective
     GLfloat MV[16]; //Modelview matrix
+
+    bool start = false;
     GLfloat Prot[16];
+
 
     float dt;
 
     //Start positions and start velocities
     glm::vec2 ballPositions[16];
     glm::vec2 ballVelocities[16];
-    glm::vec2 ballRotations[16];
     getBallPos(ballPositions);
     startVelocities(ballVelocities);
-
-    for(int i = 0; i < 16; ++i){
-        ballRotations[i].x = ballRotations[i].y = 0.0f;
-    }
 
     //Animation matrices
     GLint location_P;
@@ -100,7 +103,7 @@ int main(int argc, char *argv[]) {
 
 
     Texture tex0, tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
-    tex10, tex11, tex12, tex13, tex14, tex15, texBord;
+    tex10, tex11, tex12, tex13, tex14, tex15, texBord, texRum;
 
     GLint location_tex;
 
@@ -108,8 +111,10 @@ int main(int argc, char *argv[]) {
     KeyTranslator myKeyTranslator;
 
     //Constant Matrices (Not animated)
-    Utilities::mat4perspective(P, M_PI/4, 1, 0.1, 100.0);
+
+    Utilities::mat4perspective(P, M_PI/4, 1.8, 0.1, 100.0);
     Utilities::mat4translate(T2, -1.465f, -0.5, -3.0);
+
 
     const GLFWvidmode *vidmode;  // GLFW struct to hold information about the display
 	GLFWwindow *window;    // GLFW struct to hold information about the window
@@ -128,7 +133,7 @@ int main(int argc, char *argv[]) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // Open a square window (aspect 1:1) to fill half the screen height
-    window = glfwCreateWindow(vidmode->height, vidmode->height, "GLprimer", NULL, NULL);
+    window = glfwCreateWindow(1920, 1080, "GLprimer", NULL, NULL);
     if (!window)
     {
         cout << "Unable to open window. Terminating." << endl;
@@ -149,7 +154,7 @@ int main(int argc, char *argv[]) {
     //Create objects here
     myShape.createSphere(0.0286f, 32);
     poolTable.readOBJ("PoolTable/PoolTable2.obj");
-
+    room.readOBJ("room.obj");
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
 
@@ -174,6 +179,7 @@ int main(int argc, char *argv[]) {
     tex15.createTexture("textures/Ball15.tga");     tex[15] = tex15;
 
     texBord.createTexture("textures/Bord.tga");
+    texRum.createTexture("textures/room.tga");
 
     //Skicka variabler till shaders
 	location_time = glGetUniformLocation(myShader.programID, "time");
@@ -231,7 +237,7 @@ int main(int argc, char *argv[]) {
         //I ordning: Translatera från origo, rotera, translatera med knappar
         Utilities::mat4mult(Tx,Ty,MV);
         Utilities::mat4mult(MV,T2,MV);
-        Utilities::mat4mult(MV,Tt,MV);
+        Utilities::mat4mult(Tt,MV,MV); //MV Tt
 
 
         /* ---- Rendering code should go here ---- */
@@ -244,21 +250,45 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
-
         ballToBorderCollision(ballPositions, ballVelocities);
         ballToBallCollision(ballPositions, ballVelocities);
 
         dt = time - prev_time; //Time passed since last iteration
 
+
+        if(GetKeyState('A') == true){
+            start = true;
+            //ballVelocities[0].x = 3.0;
+        }
+
         // Friction
-        //updateTransFriction(ballVelocities, dt);
+        updateTransFriction(ballVelocities, dt);
 
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
-            ballPositions[i] += ballVelocities[i]*dt; //dt orsakar kollisionsfel, antagligen pga olika steglängd
-            ballRotations[i] += ballVelocities[i]*dt/r;
-            updateAndRender(ballPositions[i].x, ballPositions[i].y, ballRotations[i].x, ballRotations[i].y);
+
+            float angle = 0.0f;
+
+            if(start == true){
+                ballPositions[i] += ballVelocities[i]*dt; //dt orsakar kollisionsfel, antagligen pga olika steglängd
+
+                const float EPS = 1e-5;
+
+                if(ballVelocities[i].y > EPS && ballVelocities[i].x > EPS){
+                    angle = atan(ballVelocities[i].y/ballVelocities[i].x);
+                }
+                else if((ballVelocities[i].y > EPS && ballVelocities[i].x < EPS) || (ballVelocities[i].y < EPS && ballVelocities[i].x < EPS)){
+                    angle = M_PI+atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                }
+                else{
+                    angle = 2*M_PI+atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                }
+                float rot = sqrt(pow(ballVelocities[i].x,2)+pow(ballVelocities[i].y,2))/r;
+                ballRotations[i] += rot*dt;
+            }
+
+            updateAndRender(ballPositions[i].x, ballPositions[i].y, angle, ballRotations[i]);
         }
 
         prev_time = time; //Set previous time to current time
@@ -272,6 +302,18 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
         glBindTexture(GL_TEXTURE_2D, texBord.textureID);
         poolTable.render();
+
+        // Render Room
+        Utilities::mat4rotx(T_table, M_PI/2);
+        Utilities::mat4roty(T_room, M_PI/2);
+        Utilities::mat4mult(T_table, T_room, T_table);
+        Utilities::mat4scale(Trot, 0.09f);
+        Utilities::mat4mult(T_table, Trot, Trot);
+        Utilities::mat4translate(T, 3,0,-0.55f);
+        Utilities::mat4mult(T, Trot, T);
+        glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
+        glBindTexture(GL_TEXTURE_2D, texRum.textureID);
+        room.render();
 
         // Textures for object 1
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -298,18 +340,26 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void updateAndRender(float x, float y, float x_rot, float y_rot){
+void updateAndRender(float x, float y, float angle, float rot){
 
-    /*Utilities::mat4rotx(Trot_x, -y_rot);
-    Utilities::mat4roty(Trot_z, x_rot);
-    Utilities::mat4mult(Trot_z, Trot_x, Trot);*/
+    /*float angle;
+    const float EPS = 1e-5;
 
-    float angle = x/sqrt(pow(x,2)+pow(y,2));
-    float rot = sqrt(pow(x,2)+pow(y,2))/r;
+    if(ballVelocity.y > EPS && ballVelocity.x > EPS){
+        angle = atan(ballVelocity.y/ballVelocity.x);
+    }
+    else if((ballVelocity.y > EPS && ballVelocity.x < EPS) || (ballVelocity.y < EPS && ballVelocity.x < EPS)){
+        angle = M_PI+atan(ballVelocity.y/ballVelocity.x);
+    }
+    else{
+        angle = 2*M_PI+atan(ballVelocity.y/ballVelocity.x);
+    }
 
-    Utilities::mat4rotz(Trot_z, angle);
-    Utilities::mat4rotx(Trot_x, -rot);
-    Utilities::mat4rotz(Trot_z_i, -angle);
+    float rot = sqrt(pow(ballVelocity.x,2)+pow(ballVelocity.y,2))/r;
+    ballRotations[index] += rot*dt;*/
+    Utilities::mat4rotz(Trot_z, -angle);
+    Utilities::mat4roty(Trot_x, rot);
+    Utilities::mat4rotz(Trot_z_i, angle);
 
     Utilities::mat4mult(Trot_x, Trot_z, Trot);
     Utilities::mat4mult(Trot_z_i, Trot, Trot);
@@ -352,7 +402,7 @@ glm::vec2 *startVelocities(glm::vec2 ballVelocities[]){
         ballVelocities[i].y = 0.0f;
     }
 
-    ballVelocities[0].x = 3.0f;
+    ballVelocities[0].x = 3.0f;//3.0f;
     ballVelocities[0].y = 0.0f;
 
     return ballVelocities;
@@ -423,25 +473,25 @@ void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
         //float r = 0.0286;
 
         // Check if particles collided with the walls horizontally (x-direction)
-          if ( ballPos[i].x + r >= xMaxLengthTable - sep ){
+        if(ballPos[i].x + r >= xMaxLengthTable - sep){
 
             // Formula to calculate velocity drop and new direction
             ballVel[i].x = -sqrt(0.75*pow(ballVel[i].x,2));
         }
 
-        if ( ballPos[i].x - r <=  xMinLengthTable + sep ){
+        if(ballPos[i].x - r <=  xMinLengthTable + sep){
 
             // Formula to calculate velocity drop and new direction
             ballVel[i].x = sqrt(0.75*pow(ballVel[i].x,2));
         }
 
-        if ( ballPos[i].y + r >= yMaxLengthTable - sep ){
+        if(ballPos[i].y + r >= yMaxLengthTable - sep){
 
             // Formula to calculate velocity drop and new direction
             ballVel[i].y = -sqrt(0.75*pow(ballVel[i].y,2));
         }
 
-        if (  ballPos[i].y  - r <= yMinLengthTable + sep  ){
+        if(ballPos[i].y  - r <= yMinLengthTable + sep){
 
             // Formula to calculate velocity drop and new direction
             ballVel[i].y = sqrt(0.75*pow(ballVel[i].y,2));
@@ -455,36 +505,27 @@ void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 void updateTransFriction(glm::vec2 ballVelocities[], float dt){
 
     const float EPSILON = 1.0e-5;
-    float m = 0.165;
-    float massWhiteBall = 0.170;
+    float m;
     glm::vec2 transFriction[16];
-    float my = 0.1; // True friction for trans is 0.2
+    float my = 0.01; // True friction for trans is 0.2
 
     for(int i = 0; i < 16; i++){
 
         //Adjust mass for the white ball
-        if( i == 0 ) m = massWhiteBall;
+        if( i == 0 ){
+            m = 0.170;
+        }
+        else{
+            m = 0.165;
+        }
 
         // compute friction
-        transFriction[i].x = abs(ballVelocities[i].x*my*dt/m);
-        transFriction[i].y = abs(ballVelocities[i].y*my*dt/m);
+        transFriction[i].x = ballVelocities[i].x*my*dt/m;
+        transFriction[i].y = ballVelocities[i].y*my*dt/m;
 
-        // Determine working direction of the friction (opposite to the velocity).
-        if( ballVelocities[i].x > EPSILON){
-            ballVelocities[i].x = ballVelocities[i].x - transFriction[i].x;
-        }
-
-        if( ballVelocities[i].x < -EPSILON){
-            ballVelocities[i].x = ballVelocities[i].x + transFriction[i].x;
-        }
-
-        if( ballVelocities[i].y > EPSILON){
-            ballVelocities[i].y = ballVelocities[i].y - transFriction[i].y;
-        }
-
-        if( ballVelocities[i].y < -EPSILON){
-            ballVelocities[i].y = ballVelocities[i].y + transFriction[i].y;
-        }
+        // update velocities
+        ballVelocities[i].x = ballVelocities[i].x - transFriction[i].x;
+        ballVelocities[i].y = ballVelocities[i].y - transFriction[i].y;
 
     }
 }

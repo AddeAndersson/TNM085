@@ -18,7 +18,7 @@ void main() {
     vec3 transformedNormal = mat3(MV)*mat3(T)*Normal;
     N = normalize(transformedNormal);
 
-	gl_Position = P*MV*T*vec4(Position, 1.0);
+    gl_Position = P*MV*T*vec4(Position, 1.0);
 
     st = TexCoord;
 }
