@@ -26,7 +26,7 @@
 	"Utilities.hpp"
 	<cstdio>
 
-1551357123 c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.hpp
+1551442459 c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.hpp
 	<GLFW/glfw3.h>
 	<cstdio>
 	<cmath>
@@ -701,13 +701,24 @@
 
 1549544138 c:\skola\tnm085 - modelleringsprojekt\opengl\glm\glm\simd\integer.h
 
-1551357123 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
+1551442737 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
 	"Utilities.hpp"
 	<math.h>
 
-<<<<<<< HEAD
-1551364668 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
-=======
+1551354543 D
+
+1551443391 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
+	<iostream>
+	<sstream>
+	<string>
+	<Windows.h>
+	<GLFW/glfw3.h>
+	"Utilities.hpp"
+	"Shader.hpp"
+	"TriangleSoup.hpp"
+	"Rotator.hpp"
+	"Texture.hpp"
+
 1550229994 d:\skola\modelleringsprojekt(tnm085)\tnm085\ball.hpp
 	<glm/glm/glm.hpp>
 	<iostream>
@@ -1350,7 +1361,8 @@
 1550229995 d:\skola\modelleringsprojekt(tnm085)\tnm085\glm\glm\simd\integer.h
 
 1551354543 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
->>>>>>> 64b05e3f4b12520ed34e404f17b559a77a5d71a1
+
+1551338492 05e3f4b12520ed34e404f17b559a77a5d71a1
 	<iostream>
 	<sstream>
 	<string>
@@ -1362,8 +1374,6 @@
 	"Rotator.hpp"
 	"Texture.hpp"
 
-<<<<<<< HEAD
-=======
 1550229994 d:\skola\modelleringsprojekt(tnm085)\tnm085\glfw\glfw3.h
 	<stddef.h>
 	<OpenGL/gl3.h>
@@ -1434,4 +1444,3 @@
 	"Utilities.hpp"
 	<math.h>
 
->>>>>>> 64b05e3f4b12520ed34e404f17b559a77a5d71a1

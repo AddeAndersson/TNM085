@@ -158,6 +158,17 @@ void Utilities::mat4scale(float M[], float scale) {
     M[12] = 0;    M[13] = 0;    M[14] = 0;     M[15] = 1.0f;
 }
 
+void Utilities::mat4rotaxis(float M[], float rot, float x_vel, float y_vel) {
+
+    float Ux = y_vel/sqrt(pow(x_vel,2)+pow(y_vel,2));
+    float Uy = -x_vel/sqrt(pow(x_vel,2)+pow(y_vel,2));
+
+    M[0] = cos(rot)+pow(Ux,2)*(1-cos(rot)); M[1] = Uy*Ux*(1-cos(rot));              M[2] = -Uy*sin(rot); M[3] = 0;
+    M[4] = Ux*Uy*(1-cos(rot));              M[5] = cos(rot)+pow(Uy,2)*(1-cos(rot)); M[6] = Ux*sin(rot);  M[7] = 0;
+    M[8] = Uy*sin(rot);                     M[9] = -Ux*sin(rot);                    M[10] = cos(rot);    M[11] = 0;
+    M[12] = 0;                              M[13] = 0;                              M[14] = 0;           M[15] = 1.0f;
+}
+
 void Utilities::mat4perspective(float M[], float vfov, float aspect, float znear, float zfar) {
     float f = 1/tan(vfov/2.0);
 

@@ -53,7 +53,7 @@ void updateTransFriction(glm::vec2 ballVelocities[], float dt);
 
 GLfloat T[16]; //Object Matrix
 GLfloat Trot[16]; //Object Rotation
-GLfloat Trot_x[16];
+GLfloat Trot_y[16];
 GLfloat Trot_z[16];
 GLfloat Trot_z_i[16];
 float r = 0.0286;
@@ -85,6 +85,14 @@ int main(int argc, char *argv[]) {
 
     bool start = false;
     GLfloat Prot[16];
+
+    // Debugging
+    /*
+    std::cout << atan(1/1)*180/M_PI << " 1st" << endl;
+    std::cout << atan(1/-1)*180/M_PI << " 2nd" << endl;
+    std::cout << atan(-1/-1)*180/M_PI << " 3rd" << endl;
+    std::cout << atan(-1/1)*180/M_PI << " 4th" << endl;
+    */
 
 
     float dt;
@@ -262,32 +270,30 @@ int main(int argc, char *argv[]) {
 
         // Friction
         updateTransFriction(ballVelocities, dt);
-
+        float angle = 0.0f;
+        float rot = 0.0f;
 
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
-            glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
-
-            float angle = 0.0f;
 
             if(start == true){
+
                 ballPositions[i] += ballVelocities[i]*dt; //dt orsakar kollisionsfel, antagligen pga olika steglängd
 
                 const float EPS = 1e-5;
 
-                if(ballVelocities[i].y > EPS && ballVelocities[i].x > EPS){
-                    angle = atan(ballVelocities[i].y/ballVelocities[i].x);
-                }
-                else if((ballVelocities[i].y > EPS && ballVelocities[i].x < EPS) || (ballVelocities[i].y < EPS && ballVelocities[i].x < EPS)){
+                if((ballVelocities[i].y > 0.0f && ballVelocities[i].x < 0.0f) || (ballVelocities[i].y < 0.0f && ballVelocities[i].x < 0.0f)){
                     angle = M_PI+atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
                 }
                 else{
-                    angle = 2*M_PI+atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                    angle = atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
                 }
-                float rot = sqrt(pow(ballVelocities[i].x,2)+pow(ballVelocities[i].y,2))/r;
+
+                rot = sqrt(pow(ballVelocities[i].x,2)+pow(ballVelocities[i].y,2))/r;
                 ballRotations[i] += rot*dt;
             }
 
+            glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
             updateAndRender(ballPositions[i].x, ballPositions[i].y, angle, ballRotations[i]);
         }
 
@@ -343,12 +349,16 @@ int main(int argc, char *argv[]) {
 void updateAndRender(float x, float y, float angle, float rot){
 
     Utilities::mat4rotz(Trot_z, -angle);
-    Utilities::mat4roty(Trot_x, rot);
+    Utilities::mat4roty(Trot_y, rot);
     Utilities::mat4rotz(Trot_z_i, angle);
 
-    Utilities::mat4mult(Trot_x, Trot_z, Trot);
+    Utilities::mat4mult(Trot_y, Trot_z, Trot);
     Utilities::mat4mult(Trot_z_i, Trot, Trot);
 
+    /*Utilities::mat4rotx(Trot_z, -y_vel);
+    Utilities::mat4roty(Trot_y, -x_vel);
+    Utilities::mat4mult(Trot_z, Trot_y, Trot);*/
+    //Utilities::mat4rotaxis(Trot, rot, x_vel, y_vel);
 
     Utilities::mat4translate(T, x, y, 0.0f);
     Utilities::mat4mult(T, Trot, T);
@@ -489,7 +499,7 @@ void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 /----------------------------------*/
 void updateTransFriction(glm::vec2 ballVelocities[], float dt){
 
-    const float EPSILON = 1.0e-5;
+    //const float EPSILON = 1.0e-5;
     float m;
     glm::vec2 transFriction[16];
     float my = 0.01; // True friction for trans is 0.2

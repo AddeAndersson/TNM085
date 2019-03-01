@@ -85,6 +85,7 @@ void mat4roty(float M[], float angle);
 void mat4rotz(float M[], float angle);
 void mat4translate(float M[], float x, float y, float z);
 void mat4scale(float M[], float scale);
+void mat4rotaxis(float M[], float rot, float x_vel, float y_vel);
 
 
 //M is the matrix we want to create (an output argument)
