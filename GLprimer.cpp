@@ -43,6 +43,7 @@
 #include "Texture.hpp"
 
 //Declarations
+//void updateAndRender(float x, float y, glm::vec2 ballVelocity, int index, float dt);
 void updateAndRender(float x, float y, float x_rot, float y_rot);
 glm::vec2 *getBallPos(glm::vec2 ballPositions[]);
 glm::vec2 *startVelocities(glm::vec2 ballVelocities[]);
@@ -56,6 +57,7 @@ GLfloat Trot_x[16];
 GLfloat Trot_z[16];
 GLfloat Trot_z_i[16];
 float r = 0.0286;
+//float ballRotations[16] = {0.0f};
 //GLfloat Trot1[16];
 GLint location_T; //Object translations
 TriangleSoup myShape;
@@ -273,18 +275,13 @@ int main(int argc, char *argv[]) {
         for(unsigned int i = 0; i < 16; ++i){
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
 
-
-            if(start == false){
-            ballPositions[i];
-            ballRotations[i];
-            }
-            else{
-
+            if(start == true){
             ballPositions[i] += ballVelocities[i]*dt; //dt orsakar kollisionsfel, antagligen pga olika steglängd
             ballRotations[i] += ballVelocities[i]*dt/r;
             }
 
             updateAndRender(ballPositions[i].x, ballPositions[i].y, ballRotations[i].x, ballRotations[i].y);
+            //updateAndRender(ballPositions[i].x, ballPositions[i].y, ballVelocities[i], i, dt);
         }
 
         prev_time = time; //Set previous time to current time
@@ -338,10 +335,6 @@ int main(int argc, char *argv[]) {
 
 void updateAndRender(float x, float y, float x_rot, float y_rot){
 
-    /*Utilities::mat4rotx(Trot_x, -y_rot);
-    Utilities::mat4roty(Trot_z, x_rot);
-    Utilities::mat4mult(Trot_z, Trot_x, Trot);*/
-
     float angle = x/sqrt(pow(x,2)+pow(y,2));
     float rot = sqrt(pow(x,2)+pow(y,2))/r;
 
@@ -358,6 +351,38 @@ void updateAndRender(float x, float y, float x_rot, float y_rot){
     glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
     myShape.render();
 }
+
+/*void updateAndRender(float x, float y, glm::vec2 ballVelocity, int index, float dt){
+
+    float angle;
+    const float EPS = 1e-5;
+
+    if(ballVelocity.y > EPS && ballVelocity.x > EPS){
+        angle = atan(ballVelocity.y/ballVelocity.x);
+    }
+    else if((ballVelocity.y > EPS && ballVelocity.x < EPS) || (ballVelocity.y < EPS && ballVelocity.x < EPS)){
+        angle = M_PI+atan(ballVelocity.y/ballVelocity.x);
+    }
+    else{
+        angle = 2*M_PI+atan(ballVelocity.y/ballVelocity.x);
+    }
+
+    float rot = sqrt(pow(ballVelocity.x,2)+pow(ballVelocity.y,2))/r;
+    ballRotations[index] += rot*dt;
+
+    Utilities::mat4rotz(Trot_z, -angle);
+    Utilities::mat4roty(Trot_x, ballRotations[index]);
+    Utilities::mat4rotz(Trot_z_i, angle);
+
+    Utilities::mat4mult(Trot_x, Trot_z, Trot);
+    Utilities::mat4mult(Trot_z_i, Trot, Trot);
+
+
+    Utilities::mat4translate(T, x, y, 0.0f);
+    Utilities::mat4mult(T, Trot, T);
+    glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
+    myShape.render();
+}*/
 
 glm::vec2 *getBallPos(glm::vec2 ballPositions[]) {
 
