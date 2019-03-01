@@ -1,174 +1,10 @@
 # depslib dependency file v1.0
-1549006240 source:d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\glprimer.cpp
-	<iostream>
-	<GLFW/glfw3.h>
-	"Utilities.hpp"
-	"Shader.hpp"
-	"TriangleSoup.hpp"
-
-1549007256 d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\glfw\glfw3.h
-	<stddef.h>
-	<OpenGL/gl3.h>
-	<OpenGL/gl.h>
-	<OpenGL/glu.h>
-	<GL/glcorearb.h>
-	<GLES/gl.h>
-	<GLES2/gl2.h>
-	<GLES3/gl3.h>
-	<GL/gl.h>
-	<GL/glu.h>
-
-1549006240 d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\utilities.hpp
-	<GLFW/glfw3.h>
-	<cstdio>
-	<cmath>
-	<GL/glext.h>
-
-1549007256 d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\gl\glext.h
-	<windows.h>
-	<stddef.h>
-	<inttypes.h>
-	<inttypes.h>
-	<inttypes.h>
-	<stdint.h>
-	<stdint.h>
-	<inttypes.h>
-
-1549007258 d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\shader.hpp
-	<GLFW/glfw3.h>
-	"Utilities.hpp"
-	<cstdio>
-
-1549007259 d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\trianglesoup.hpp
-	<GLFW/glfw3.h>
-	<cstdio>
-	<cmath>
-	<cstring>
-	"Utilities.hpp"
-
-1549007258 source:d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\rotator.cpp
+1551357019 source:c:\skola\tnm085 - modelleringsprojekt\opengl\rotator.cpp
 	"Rotator.hpp"
 
-1549007258 d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\rotator.hpp
+1551354385 c:\skola\tnm085 - modelleringsprojekt\opengl\rotator.hpp
 	<GLFW/glfw3.h>
 	<cmath>
-
-1549007258 source:d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\shader.cpp
-	"Shader.hpp"
-
-1549007258 source:d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\texture.cpp
-	"Texture.hpp"
-
-1549007258 d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\texture.hpp
-	<GLFW/glfw3.h>
-	<cstdio>
-	<cstring>
-	"Utilities.hpp"
-
-1549007259 source:d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\trianglesoup.cpp
-	"TriangleSoup.hpp"
-
-1549006240 source:d:\skola\modelleringsprojekt(tnm085)\modelleringsprojekt\stegu\utilities.cpp
-	"Utilities.hpp"
-
-1549007258 source:d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\rotator.cpp
-	"Rotator.hpp"
-
-1549007258 d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\rotator.hpp
-	<GLFW/glfw3.h>
-	<cmath>
-
-1549007256 d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\glfw\glfw3.h
-	<stddef.h>
-	<OpenGL/gl3.h>
-	<OpenGL/gl.h>
-	<OpenGL/glu.h>
-	<GL/glcorearb.h>
-	<GLES/gl.h>
-	<GLES2/gl2.h>
-	<GLES3/gl3.h>
-	<GL/gl.h>
-	<GL/glu.h>
-
-1549007258 source:d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\shader.cpp
-	"Shader.hpp"
-
-1549007258 d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\shader.hpp
-	<GLFW/glfw3.h>
-	"Utilities.hpp"
-	<cstdio>
-
-1549266174 d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\utilities.hpp
-	<GLFW/glfw3.h>
-	"Ball.hpp"
-	<cstdio>
-	<cmath>
-	<GL/glext.h>
-
-1549007256 d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\gl\glext.h
-	<windows.h>
-	<stddef.h>
-	<inttypes.h>
-	<inttypes.h>
-	<inttypes.h>
-	<stdint.h>
-	<stdint.h>
-	<inttypes.h>
-
-1549007258 source:d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\texture.cpp
-	"Texture.hpp"
-
-1549007258 d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\texture.hpp
-	<GLFW/glfw3.h>
-	<cstdio>
-	<cstring>
-	"Utilities.hpp"
-
-1549007259 source:d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\trianglesoup.cpp
-	"TriangleSoup.hpp"
-
-1549007259 d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\trianglesoup.hpp
-	<GLFW/glfw3.h>
-	<cstdio>
-	<cmath>
-	<cstring>
-	"Utilities.hpp"
-
-1549006240 source:d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\utilities.cpp
-	"Utilities.hpp"
-
-1549285964 source:d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\glprimer.cpp
-	<iostream>
-	<GLFW/glfw3.h>
-	"Utilities.hpp"
-	"Shader.hpp"
-	"TriangleSoup.hpp"
-
-1549285909 d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\ball.hpp
-	<iostream>
-	<cmath>
-
-1549030571 source:d:\skola\modelleringsprojekt(tnm085)\kod matlab\tnm085\ball.cpp
-	"Ball.hpp"
-
-1549549224 source:c:\skola\tnm085 - modelleringsprojekt\opengl\ball.cpp
-	"Ball.hpp"
-
-1549548225 c:\skola\tnm085 - modelleringsprojekt\opengl\ball.hpp
-	<glm/glm/glm.hpp>
-	<iostream>
-	<cmath>
-
-1551344838 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
-	<iostream>
-	<sstream>
-	<string>
-	<GLFW/glfw3.h>
-	"Utilities.hpp"
-	"Shader.hpp"
-	"TriangleSoup.hpp"
-	"Rotator.hpp"
-	"Texture.hpp"
 
 1549524385 c:\skola\tnm085 - modelleringsprojekt\opengl\glfw\glfw3.h
 	<stddef.h>
@@ -182,9 +18,16 @@
 	<GL/gl.h>
 	<GL/glu.h>
 
-1550133089 c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.hpp
+1549524385 source:c:\skola\tnm085 - modelleringsprojekt\opengl\shader.cpp
+	"Shader.hpp"
+
+1549524385 c:\skola\tnm085 - modelleringsprojekt\opengl\shader.hpp
 	<GLFW/glfw3.h>
-	"Ball.hpp"
+	"Utilities.hpp"
+	<cstdio>
+
+1551357123 c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.hpp
+	<GLFW/glfw3.h>
 	<cstdio>
 	<cmath>
 	<GL/glext.h>
@@ -199,32 +42,6 @@
 	<stdint.h>
 	<inttypes.h>
 
-1549524385 c:\skola\tnm085 - modelleringsprojekt\opengl\shader.hpp
-	<GLFW/glfw3.h>
-	"Utilities.hpp"
-	<cstdio>
-
-1550234943 c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.hpp
-	<GLFW/glfw3.h>
-	<cstdio>
-	<cmath>
-	<stdlib.h>
-	<cstring>
-	<glm/glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-	<GL/glext.h>
-	"Utilities.hpp"
-
-1549613873 source:c:\skola\tnm085 - modelleringsprojekt\opengl\rotator.cpp
-	"Rotator.hpp"
-
-1549535601 c:\skola\tnm085 - modelleringsprojekt\opengl\rotator.hpp
-	<GLFW/glfw3.h>
-	<cmath>
-
-1549524385 source:c:\skola\tnm085 - modelleringsprojekt\opengl\shader.cpp
-	"Shader.hpp"
-
 1549524385 source:c:\skola\tnm085 - modelleringsprojekt\opengl\texture.cpp
 	"Texture.hpp"
 
@@ -237,9 +54,16 @@
 1550827772 source:c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.cpp
 	"TriangleSoup.hpp"
 
-1550133089 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
+1550234943 c:\skola\tnm085 - modelleringsprojekt\opengl\trianglesoup.hpp
+	<GLFW/glfw3.h>
+	<cstdio>
+	<cmath>
+	<stdlib.h>
+	<cstring>
+	<glm/glm/glm.hpp>
+	<glm/gtc/matrix_transform.hpp>
+	<GL/glext.h>
 	"Utilities.hpp"
-	<math.h>
 
 1549544131 c:\skola\tnm085 - modelleringsprojekt\opengl\glm\glm\glm.hpp
 	"detail/_fixes.hpp"
@@ -877,17 +701,13 @@
 
 1549544138 c:\skola\tnm085 - modelleringsprojekt\opengl\glm\glm\simd\integer.h
 
-1549615600 c:\skola\tnm085 - modelleringsprojekt\opengl\gl\glew.h
-	<stddef.h>
-	<inttypes.h>
-	<stdint.h>
-	<inttypes.h>
-	<Availability.h>
-	<OpenGL/glu.h>
-	<GL/glu.h>
+1551357123 source:c:\skola\tnm085 - modelleringsprojekt\opengl\utilities.cpp
+	"Utilities.hpp"
+	<math.h>
 
-1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\ball.cpp
-	"Ball.hpp"
+1551354543 D
+
+1551364668 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
 
 1550229994 d:\skola\modelleringsprojekt(tnm085)\tnm085\ball.hpp
 	<glm/glm/glm.hpp>
@@ -1530,7 +1350,21 @@
 
 1550229995 d:\skola\modelleringsprojekt(tnm085)\tnm085\glm\glm\simd\integer.h
 
-1551360029 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
+1551445197 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
+	<iostream>
+	<sstream>
+	<string>
+	<Windows.h>
+	<GLFW/glfw3.h>
+	"Utilities.hpp"
+	"Shader.hpp"
+	"TriangleSoup.hpp"
+	"Rotator.hpp"
+	"Texture.hpp"
+
+1551338492 05e3f4b12520ed34e404f17b559a77a5d71a1
+
+1551354543 6538f144a7517db5679530bf4a223ae56e360
 	<iostream>
 	<sstream>
 	<string>
@@ -1586,7 +1420,7 @@
 	<GL/glext.h>
 	"Utilities.hpp"
 
-1550229994 d:\skola\modelleringsprojekt(tnm085)\tnm085\rotator.hpp
+1551425776 d:\skola\modelleringsprojekt(tnm085)\tnm085\rotator.hpp
 	<GLFW/glfw3.h>
 	<cmath>
 
@@ -1596,7 +1430,7 @@
 	<cstring>
 	"Utilities.hpp"
 
-1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\rotator.cpp
+1551425776 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\rotator.cpp
 	"Rotator.hpp"
 
 1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\shader.cpp

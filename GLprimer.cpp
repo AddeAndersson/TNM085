@@ -44,7 +44,8 @@
 
 //Declarations
 //void updateAndRender(float x, float y, glm::vec2 ballVelocity, int index, float dt);
-void updateAndRender(float x, float y, float x_rot, float y_rot);
+
+void updateAndRender(float x, float y, float angle, float rot);
 glm::vec2 *getBallPos(glm::vec2 ballPositions[]);
 glm::vec2 *startVelocities(glm::vec2 ballVelocities[]);
 void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]);
@@ -54,10 +55,11 @@ void updateTransFriction(glm::vec2 ballVelocities[], float dt);
 GLfloat T[16]; //Object Matrix
 GLfloat Trot[16]; //Object Rotation
 GLfloat Trot_x[16];
+GLfloat Trot_y[16];
 GLfloat Trot_z[16];
 GLfloat Trot_z_i[16];
 float r = 0.0286;
-//float ballRotations[16] = {0.0f};
+float ballRotations[16] = {0.0f};
 //GLfloat Trot1[16];
 GLint location_T; //Object translations
 TriangleSoup myShape;
@@ -92,20 +94,14 @@ int main(int argc, char *argv[]) {
     //Start positions and start velocities
     glm::vec2 ballPositions[16];
     glm::vec2 ballVelocities[16];
-    glm::vec2 ballRotations[16];
     getBallPos(ballPositions);
     startVelocities(ballVelocities);
-
-    for(int i = 0; i < 16; ++i){
-        ballRotations[i].x = ballRotations[i].y = 0.0f;
-    }
 
     //Animation matrices
     GLint location_P;
     GLint location_MV;
     float time;
     GLint location_time;
-
 
     Texture tex0, tex1, tex2, tex3, tex4, tex5, tex6, tex7, tex8, tex9,
     tex10, tex11, tex12, tex13, tex14, tex15, texBord, texRum;
@@ -242,7 +238,7 @@ int main(int argc, char *argv[]) {
         //I ordning: Translatera från origo, rotera, translatera med knappar
         Utilities::mat4mult(Tx,Ty,MV);
         Utilities::mat4mult(MV,T2,MV);
-        Utilities::mat4mult(MV,Tt,MV);
+        Utilities::mat4mult(Tt,MV,MV); //MV Tt
 
 
         /* ---- Rendering code should go here ---- */
@@ -255,7 +251,6 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(location_P, 1, GL_FALSE, P);
         glUniformMatrix4fv(location_MV, 1, GL_FALSE, MV);
 
-
         ballToBorderCollision(ballPositions, ballVelocities);
         ballToBallCollision(ballPositions, ballVelocities);
 
@@ -264,24 +259,36 @@ int main(int argc, char *argv[]) {
 
         if(GetKeyState('A') == true){
             start = true;
+            //ballVelocities[0].x = 3.0;
         }
 
-
         // Friction
-        //updateTransFriction(ballVelocities, dt);
+        updateTransFriction(ballVelocities, dt);
 
 
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
 
+            float angle = 0.0f;
+
             if(start == true){
-            ballPositions[i] += ballVelocities[i]*dt; //dt orsakar kollisionsfel, antagligen pga olika steglängd
-            ballRotations[i] += ballVelocities[i]*dt/r;
+                ballPositions[i] += ballVelocities[i]*dt; //dt orsakar kollisionsfel, antagligen pga olika steglängd
+
+                const float EPS = 1e-10;
+
+                if((ballVelocities[i].y > EPS && ballVelocities[i].x < EPS) || (ballVelocities[i].y < -EPS && ballVelocities[i].x < -EPS)){
+                    angle = M_PI+atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                }
+                else if((ballVelocities[i].y > EPS && ballVelocities[i].x > EPS) || ((ballVelocities[i].y < EPS && ballVelocities[i].x > EPS))){
+                    angle = atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                }
+
+                float rot = sqrt(pow(ballVelocities[i].x,2)+pow(ballVelocities[i].y,2))/r;
+                ballRotations[i] += rot*dt;
             }
 
-            updateAndRender(ballPositions[i].x, ballPositions[i].y, ballRotations[i].x, ballRotations[i].y);
-            //updateAndRender(ballPositions[i].x, ballPositions[i].y, ballVelocities[i], i, dt);
+            updateAndRender(ballPositions[i].x, ballPositions[i].y, angle, ballRotations[i]);
         }
 
         prev_time = time; //Set previous time to current time
@@ -296,7 +303,7 @@ int main(int argc, char *argv[]) {
         glBindTexture(GL_TEXTURE_2D, texBord.textureID);
         poolTable.render();
 
-        //render room
+        // Render Room
         Utilities::mat4rotx(T_table, M_PI/2);
         Utilities::mat4roty(T_room, M_PI/2);
         Utilities::mat4mult(T_table, T_room, T_table);
@@ -333,17 +340,23 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void updateAndRender(float x, float y, float x_rot, float y_rot){
 
-    float angle = x/sqrt(pow(x,2)+pow(y,2));
-    float rot = sqrt(pow(x,2)+pow(y,2))/r;
+void updateAndRender(float x, float y, float angle, float rot){
 
-    Utilities::mat4rotz(Trot_z, angle);
-    Utilities::mat4rotx(Trot_x, -rot);
-    Utilities::mat4rotz(Trot_z_i, -angle);
+    Utilities::mat4rotz(Trot_z, -angle);
+    Utilities::mat4roty(Trot_x, rot);
+    Utilities::mat4rotz(Trot_z_i, angle);
 
     Utilities::mat4mult(Trot_x, Trot_z, Trot);
     Utilities::mat4mult(Trot_z_i, Trot, Trot);
+
+   /* float xRot = cos(angle)*rot;
+    float yRot = sin(angle)*rot;
+
+    Utilities::mat4roty(Trot_y, xRot);
+    Utilities::mat4rotx(Trot_x, yRot);
+
+    Utilities::mat4mult(Trot_x, Trot_y, Trot);*/
 
 
     Utilities::mat4translate(T, x, y, 0.0f);
@@ -351,38 +364,6 @@ void updateAndRender(float x, float y, float x_rot, float y_rot){
     glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
     myShape.render();
 }
-
-/*void updateAndRender(float x, float y, glm::vec2 ballVelocity, int index, float dt){
-
-    float angle;
-    const float EPS = 1e-5;
-
-    if(ballVelocity.y > EPS && ballVelocity.x > EPS){
-        angle = atan(ballVelocity.y/ballVelocity.x);
-    }
-    else if((ballVelocity.y > EPS && ballVelocity.x < EPS) || (ballVelocity.y < EPS && ballVelocity.x < EPS)){
-        angle = M_PI+atan(ballVelocity.y/ballVelocity.x);
-    }
-    else{
-        angle = 2*M_PI+atan(ballVelocity.y/ballVelocity.x);
-    }
-
-    float rot = sqrt(pow(ballVelocity.x,2)+pow(ballVelocity.y,2))/r;
-    ballRotations[index] += rot*dt;
-
-    Utilities::mat4rotz(Trot_z, -angle);
-    Utilities::mat4roty(Trot_x, ballRotations[index]);
-    Utilities::mat4rotz(Trot_z_i, angle);
-
-    Utilities::mat4mult(Trot_x, Trot_z, Trot);
-    Utilities::mat4mult(Trot_z_i, Trot, Trot);
-
-
-    Utilities::mat4translate(T, x, y, 0.0f);
-    Utilities::mat4mult(T, Trot, T);
-    glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
-    myShape.render();
-}*/
 
 glm::vec2 *getBallPos(glm::vec2 ballPositions[]) {
 
@@ -415,7 +396,7 @@ glm::vec2 *startVelocities(glm::vec2 ballVelocities[]){
         ballVelocities[i].y = 0.0f;
     }
 
-    ballVelocities[0].x = 3.0f;
+    ballVelocities[0].x = 3.0f;//3.0f;
     ballVelocities[0].y = 0.0f;
 
     return ballVelocities;
@@ -436,6 +417,7 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 
     // distance + separation
     float l = 2*r + sep;
+    float n = 1e-4;
 
     for(int i = 0; i < 15; ++i){
         for(int  j = i+1; j < 16; j++){
@@ -452,6 +434,13 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 
             // Check for collision
             if(norm  <= l){
+
+                // Move balls before computing new velocity to prevent overlap.
+                ballPos[i].x = ballPos[i].x  - n*ballVel[i].x;
+                ballPos[i].y = ballPos[i].y  - n*ballVel[i].y;
+
+                ballPos[j].x = ballPos[j].x  - n*ballVel[j].x;
+                ballPos[j].y = ballPos[j].y  - n*ballVel[j].y;
 
                 temp = ballPos[i] - ballPos[j];
                 float length = sqrt(pow(temp.x,2) + pow(temp.y,2));
@@ -486,25 +475,25 @@ void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
         //float r = 0.0286;
 
         // Check if particles collided with the walls horizontally (x-direction)
-          if ( ballPos[i].x + r >= xMaxLengthTable - sep ){
+        if(ballPos[i].x + r >= xMaxLengthTable - sep){
 
             // Formula to calculate velocity drop and new direction
             ballVel[i].x = -sqrt(0.75*pow(ballVel[i].x,2));
         }
 
-        if ( ballPos[i].x - r <=  xMinLengthTable + sep ){
+        if(ballPos[i].x - r <=  xMinLengthTable + sep){
 
             // Formula to calculate velocity drop and new direction
             ballVel[i].x = sqrt(0.75*pow(ballVel[i].x,2));
         }
 
-        if ( ballPos[i].y + r >= yMaxLengthTable - sep ){
+        if(ballPos[i].y + r >= yMaxLengthTable - sep){
 
             // Formula to calculate velocity drop and new direction
             ballVel[i].y = -sqrt(0.75*pow(ballVel[i].y,2));
         }
 
-        if (  ballPos[i].y  - r <= yMinLengthTable + sep  ){
+        if(ballPos[i].y  - r <= yMinLengthTable + sep){
 
             // Formula to calculate velocity drop and new direction
             ballVel[i].y = sqrt(0.75*pow(ballVel[i].y,2));
@@ -517,36 +506,23 @@ void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 /----------------------------------*/
 void updateTransFriction(glm::vec2 ballVelocities[], float dt){
 
-    const float EPSILON = 1.0e-5;
-    float m = 0.165;
-    float massWhiteBall = 0.170;
-    glm::vec2 transFriction[16];
-    float my = 0.1; // True friction for trans is 0.2
+    float g = 9.82;
+    float my = 0.01; // True friction for trans is 0.2
+    float friction = my*g*dt;
 
     for(int i = 0; i < 16; i++){
 
-        //Adjust mass for the white ball
-        if( i == 0 ) m = massWhiteBall;
-
-        // compute friction
-        transFriction[i].x = abs(ballVelocities[i].x*my*dt/m);
-        transFriction[i].y = abs(ballVelocities[i].y*my*dt/m);
-
-        // Determine working direction of the friction (opposite to the velocity).
-        if( ballVelocities[i].x > EPSILON){
-            ballVelocities[i].x = ballVelocities[i].x - transFriction[i].x;
+        if(ballVelocities[i].x > 0.0f){
+            ballVelocities[i].x = ballVelocities[i].x - friction;
         }
-
-        if( ballVelocities[i].x < -EPSILON){
-            ballVelocities[i].x = ballVelocities[i].x + transFriction[i].x;
+        if(ballVelocities[i].x < 0.0f){
+            ballVelocities[i].x = ballVelocities[i].x + friction;
         }
-
-        if( ballVelocities[i].y > EPSILON){
-            ballVelocities[i].y = ballVelocities[i].y - transFriction[i].y;
+        if(ballVelocities[i].y > 0.0f){
+            ballVelocities[i].y = ballVelocities[i].y - friction;
         }
-
-        if( ballVelocities[i].y < -EPSILON){
-            ballVelocities[i].y = ballVelocities[i].y + transFriction[i].y;
+        if(ballVelocities[i].y < 0.0f){
+            ballVelocities[i].y = ballVelocities[i].y + friction;
         }
 
     }
