@@ -705,9 +705,23 @@
 	"Utilities.hpp"
 	<math.h>
 
-1551354543 D
+1550229995 D
 
-1551443391 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
+1551944028 source:c:\skola\tnm085 - modelleringsprojekt\opengl\glprimer.cpp
+	<iostream>
+	<sstream>
+	<string>
+	<Windows.h>
+	<GLFW/glfw3.h>
+	"Utilities.hpp"
+	"Shader.hpp"
+	"TriangleSoup.hpp"
+	"Rotator.hpp"
+	"Texture.hpp"
+
+1551443391 pp"
+
+1551354543 af4fc5367e9ec6887e9e274167449e94c239e
 	<iostream>
 	<sstream>
 	<string>
@@ -1360,9 +1374,7 @@
 
 1550229995 d:\skola\modelleringsprojekt(tnm085)\tnm085\glm\glm\simd\integer.h
 
-1551354543 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
-
-1551338492 05e3f4b12520ed34e404f17b559a77a5d71a1
+1551445197 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\glprimer.cpp
 	<iostream>
 	<sstream>
 	<string>
@@ -1373,6 +1385,10 @@
 	"TriangleSoup.hpp"
 	"Rotator.hpp"
 	"Texture.hpp"
+
+1551338492 05e3f4b12520ed34e404f17b559a77a5d71a1
+
+1551354543 6538f144a7517db5679530bf4a223ae56e360
 
 1550229994 d:\skola\modelleringsprojekt(tnm085)\tnm085\glfw\glfw3.h
 	<stddef.h>
@@ -1418,7 +1434,7 @@
 	<GL/glext.h>
 	"Utilities.hpp"
 
-1550229994 d:\skola\modelleringsprojekt(tnm085)\tnm085\rotator.hpp
+1551425776 d:\skola\modelleringsprojekt(tnm085)\tnm085\rotator.hpp
 	<GLFW/glfw3.h>
 	<cmath>
 
@@ -1428,7 +1444,7 @@
 	<cstring>
 	"Utilities.hpp"
 
-1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\rotator.cpp
+1551425776 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\rotator.cpp
 	"Rotator.hpp"
 
 1550229994 source:d:\skola\modelleringsprojekt(tnm085)\tnm085\shader.cpp

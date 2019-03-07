@@ -1,3 +1,11 @@
+//Keep at it on frictional forces, balls accelerate for some reason,
+//most likely due to a wrong sign
+
+//Overlapping balls, the parameter n needs to change to an actual overlap
+
+//Try creating multiple balls as different objects, as for the textures
+
+
 /*
  * A C++ framework for OpenGL programming in TNM046 for MT1 2014.
  *
@@ -44,6 +52,7 @@
 
 //Declarations
 //void updateAndRender(float x, float y, glm::vec2 ballVelocity, int index, float dt);
+
 void updateAndRender(float x, float y, float angle, float rot);
 glm::vec2 *getBallPos(glm::vec2 ballPositions[]);
 glm::vec2 *startVelocities(glm::vec2 ballVelocities[]);
@@ -58,6 +67,7 @@ GLfloat Trot_z[16];
 GLfloat Trot_z_i[16];
 float r = 0.0286;
 float ballRotations[16] = {0.0f};
+float ballAngles[16] = {0.0f};
 //GLfloat Trot1[16];
 GLint location_T; //Object translations
 TriangleSoup myShape;
@@ -160,6 +170,7 @@ int main(int argc, char *argv[]) {
 
     //Create objects here
     myShape.createSphere(0.0286f, 32);
+
     poolTable.readOBJ("PoolTable/PoolTable2.obj");
     room.readOBJ("room.obj");
 
@@ -167,7 +178,6 @@ int main(int argc, char *argv[]) {
 
     //Create textures
     location_tex = glGetUniformLocation(myShader.programID, "tex");
-
     tex0.createTexture("textures/BallCue.tga");     tex[0] = tex0;
     tex1.createTexture("textures/Ball1.tga");       tex[1] = tex1;
     tex2.createTexture("textures/Ball2.tga");       tex[2] = tex2;
@@ -214,6 +224,7 @@ int main(int argc, char *argv[]) {
     poolTable.printInfo();
 
     float prev_time = 0.0f;
+    float rot = 0.0f;
 
     // Main loop
     while(!glfwWindowShouldClose(window))
@@ -270,34 +281,34 @@ int main(int argc, char *argv[]) {
 
         // Friction
         updateTransFriction(ballVelocities, dt);
-        float angle = 0.0f;
-        float rot = 0.0f;
 
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
 
             if(start == true){
 
-                ballPositions[i] += ballVelocities[i]*dt; //dt orsakar kollisionsfel, antagligen pga olika steglängd
-
                 const float EPS = 1e-5;
 
-                if((ballVelocities[i].y > 0.0f && ballVelocities[i].x < 0.0f) || (ballVelocities[i].y < 0.0f && ballVelocities[i].x < 0.0f)){
-                    angle = M_PI+atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                if(sqrt(pow(ballVelocities[i].x,2)+pow(ballVelocities[i].y,2)) < EPS){
+                    rot = 0.0f;
+                    ballVelocities[i].x = ballVelocities[i].y = 0.0f;
                 }
-                else{
-                    angle = atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                else if((ballVelocities[i].y > 0.0f && ballVelocities[i].x < 0.0f) || (ballVelocities[i].y < 0.0f && ballVelocities[i].x < 0.0f)){
+                    ballAngles[i] = M_PI+atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                    rot = sqrt(pow(ballVelocities[i].x,2)+pow(ballVelocities[i].y,2))/r;
+                }
+                else if((ballVelocities[i].y > 0.0f && ballVelocities[i].x > 0.0f) || ((ballVelocities[i].y < 0.0f && ballVelocities[i].x > 0.0f))){
+                    ballAngles[i] = atan(ballVelocities[i].y/(ballVelocities[i].x+EPS));
+                    rot = sqrt(pow(ballVelocities[i].x,2)+pow(ballVelocities[i].y,2))/r;
                 }
 
-                rot = sqrt(pow(ballVelocities[i].x,2)+pow(ballVelocities[i].y,2))/r;
                 ballRotations[i] += rot*dt;
+                ballPositions[i] += ballVelocities[i]*dt;
             }
 
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
-            updateAndRender(ballPositions[i].x, ballPositions[i].y, angle, ballRotations[i]);
+            updateAndRender(ballPositions[i].x, ballPositions[i].y, ballAngles[i], ballRotations[i]);
         }
-
-        prev_time = time; //Set previous time to current time
 
         // Render Table
         Utilities::mat4rotx(T_table, M_PI/2);
@@ -332,6 +343,8 @@ int main(int argc, char *argv[]) {
 		// Poll events (read keyboard and mouse input)
 		glfwPollEvents();
 
+		prev_time = time; //Set previous time to current time
+
         // Exit if the ESC key is pressed (and also if the window is closed).
         if(glfwGetKey(window, GLFW_KEY_ESCAPE)) {
           glfwSetWindowShouldClose(window, GL_TRUE);
@@ -345,6 +358,7 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
 
 void updateAndRender(float x, float y, float angle, float rot){
 
@@ -418,6 +432,7 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 
     // distance + separation
     float l = 2*r + sep;
+    float n = 1e-4;
 
     for(int i = 0; i < 15; ++i){
         for(int  j = i+1; j < 16; j++){
@@ -445,6 +460,13 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
                 // Update velocities
                 ballVel[i] = ballVel[i] - C1*(ballPos[i] - ballPos[j]);
                 ballVel[j] = ballVel[j] - C2*(ballPos[j] - ballPos[i]);
+
+                // Move balls before computing new velocity to prevent overlap KEEP WORKING ON PARAMETER N
+                ballPos[i].x = ballPos[i].x  - n*ballVel[i].x;
+                ballPos[i].y = ballPos[i].y  - n*ballVel[i].y;
+
+                ballPos[j].x = ballPos[j].x  - n*ballVel[j].x;
+                ballPos[j].y = ballPos[j].y  - n*ballVel[j].y;
             }
         }
     }
@@ -499,28 +521,27 @@ void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 /----------------------------------*/
 void updateTransFriction(glm::vec2 ballVelocities[], float dt){
 
-    //const float EPSILON = 1.0e-5;
-    float m;
-    glm::vec2 transFriction[16];
+    float g = 9.82;
     float my = 0.01; // True friction for trans is 0.2
+    float friction = my*g*dt;
+    const float EPS = 1e-5;
 
     for(int i = 0; i < 16; i++){
 
-        //Adjust mass for the white ball
-        if( i == 0 ){
-            m = 0.170;
+        float friction_x = abs(friction*cos(atan(ballVelocities[i].y/(ballVelocities[i].x+EPS))));
+        float friction_y = abs(friction*sin(atan(ballVelocities[i].y/(ballVelocities[i].x+EPS))));
+
+        if(ballVelocities[i].x > EPS){
+            ballVelocities[i].x = std::max(ballVelocities[i].x-friction_x, 0.0f);
         }
-        else{
-            m = 0.165;
+        if(ballVelocities[i].x < -EPS){
+            ballVelocities[i].x = std::min(ballVelocities[i].x+friction_x, 0.0f);
         }
-
-        // compute friction
-        transFriction[i].x = ballVelocities[i].x*my*dt/m;
-        transFriction[i].y = ballVelocities[i].y*my*dt/m;
-
-        // update velocities
-        ballVelocities[i].x = ballVelocities[i].x - transFriction[i].x;
-        ballVelocities[i].y = ballVelocities[i].y - transFriction[i].y;
-
+        if(ballVelocities[i].y > EPS){
+            ballVelocities[i].y = std::max(ballVelocities[i].y-friction_y, 0.0f);
+        }
+        if(ballVelocities[i].y < -EPS){
+            ballVelocities[i].y = std::min(ballVelocities[i].y+friction_y, 0.0f);
+        }
     }
 }
