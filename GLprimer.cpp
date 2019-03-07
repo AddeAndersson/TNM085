@@ -94,7 +94,6 @@ int main(int argc, char *argv[]) {
     GLfloat MV[16]; //Modelview matrix
 
     bool start = false;
-    GLfloat Prot[16];
 
     // Debugging
     /*
@@ -279,9 +278,6 @@ int main(int argc, char *argv[]) {
             //ballVelocities[0].x = 3.0;
         }
 
-        // Friction
-        updateTransFriction(ballVelocities, dt);
-
         //Render 16 objects
         for(unsigned int i = 0; i < 16; ++i){
 
@@ -309,6 +305,8 @@ int main(int argc, char *argv[]) {
             glBindTexture(GL_TEXTURE_2D, tex[i].textureID);
             updateAndRender(ballPositions[i].x, ballPositions[i].y, ballAngles[i], ballRotations[i]);
         }
+        // Friction
+        updateTransFriction(ballVelocities, dt);
 
         // Render Table
         Utilities::mat4rotx(T_table, M_PI/2);
@@ -428,11 +426,10 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
     float C1,C2,m1,m2,norm;
     float massWhiteBall = 0.170;
     float massRestOfBalls = 0.165;
-    float sep = 0;
 
     // distance + separation
-    float l = 2*r + sep;
-    float n = 1e-4;
+    float d = 2*r;
+    //float n = 1e-4;
 
     for(int i = 0; i < 15; ++i){
         for(int  j = i+1; j < 16; j++){
@@ -448,25 +445,39 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
             norm = distance(ballPos[i], ballPos[j]);
 
             // Check for collision
-            if(norm  <= l){
+            if(norm  <= d){
 
+                //float n_x = d - abs((ballPos[i].x-ballPos[j].x));
+                //float n_y = d - abs((ballPos[i].y-ballPos[j].y));
                 temp = ballPos[i] - ballPos[j];
                 float length = sqrt(pow(temp.x,2) + pow(temp.y,2));
 
                 // compute new direction
-                C1 = (2*m2/(m1+m2))*dot((ballVel[i]-ballVel[j]) , (ballPos[i] - ballPos[j]))/pow(length,2);
-                C2 = (2*m1/(m1+m2))*dot((ballVel[j]-ballVel[i]) , (ballPos[j] - ballPos[i]))/pow(length,2);
+                C1 = (2*m2/(m1+m2))*dot((ballVel[i]-ballVel[j]), (ballPos[i] - ballPos[j]))/pow(length,2);
+                C2 = (2*m1/(m1+m2))*dot((ballVel[j]-ballVel[i]), (ballPos[j] - ballPos[i]))/pow(length,2);
 
                 // Update velocities
                 ballVel[i] = ballVel[i] - C1*(ballPos[i] - ballPos[j]);
                 ballVel[j] = ballVel[j] - C2*(ballPos[j] - ballPos[i]);
 
-                // Move balls before computing new velocity to prevent overlap KEEP WORKING ON PARAMETER N
-                ballPos[i].x = ballPos[i].x  - n*ballVel[i].x;
-                ballPos[i].y = ballPos[i].y  - n*ballVel[i].y;
+                // Move balls before computing new velocity to prevent overlap
+                /*if((ballPos[i].x > ballPos[j].x )&& (n_x > 0.0f)){
+                    ballPos[i].x += n_x/2;
+                    ballPos[j].x -= n_x/2;
+                }
+                else if((ballPos[i].x < ballPos[j].x )&& (n_x > 0.0f)){
+                    ballPos[i].x -= n_x/2;
+                    ballPos[j].x += n_x/2;
+                }
 
-                ballPos[j].x = ballPos[j].x  - n*ballVel[j].x;
-                ballPos[j].y = ballPos[j].y  - n*ballVel[j].y;
+                if((ballPos[i].y > ballPos[j].y )&& (n_y > 0.0f)){
+                    ballPos[i].y += n_y/2;
+                    ballPos[j].y -= n_y/2;
+                }
+                else if((ballPos[i].y < ballPos[j].y )&& (n_y > 0.0f)){
+                    ballPos[i].y -= n_y/2;
+                    ballPos[j].y += n_y/2;
+                }*/
             }
         }
     }
@@ -477,40 +488,31 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 /----------------------------------*/
 void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
 
+     // Table properties
+    float xMaxLengthTable = 2.13+0.1;//+(2.13/2);
+    float xMinLengthTable = 0+0.5;//+(2.13/2);
+    float sep = 1e-3;
+    float yMaxLengthTable = 1.065-0.125;//+(1.065/2);
+    float yMinLengthTable = 0+0.19;//+(1.065/2);
+
     for(int i = 0; i < 16; i++){
-
-        // Table properties
-        float xMaxLengthTable = 2.13+0.1;//+(2.13/2);
-        float xMinLengthTable = 0+0.5;//+(2.13/2);
-        float sep = 1e-3;
-        float yMaxLengthTable = 1.065-0.125;//+(1.065/2);
-        float yMinLengthTable = 0+0.19;//+(1.065/2);
-
         // Ball properties, r = radius;
         //float r = 0.0286;
 
         // Check if particles collided with the walls horizontally (x-direction)
         if(ballPos[i].x + r >= xMaxLengthTable - sep){
-
-            // Formula to calculate velocity drop and new direction
             ballVel[i].x = -sqrt(0.75*pow(ballVel[i].x,2));
         }
 
         if(ballPos[i].x - r <=  xMinLengthTable + sep){
-
-            // Formula to calculate velocity drop and new direction
             ballVel[i].x = sqrt(0.75*pow(ballVel[i].x,2));
         }
 
         if(ballPos[i].y + r >= yMaxLengthTable - sep){
-
-            // Formula to calculate velocity drop and new direction
             ballVel[i].y = -sqrt(0.75*pow(ballVel[i].y,2));
         }
 
         if(ballPos[i].y  - r <= yMinLengthTable + sep){
-
-            // Formula to calculate velocity drop and new direction
             ballVel[i].y = sqrt(0.75*pow(ballVel[i].y,2));
         }
     }
@@ -525,23 +527,29 @@ void updateTransFriction(glm::vec2 ballVelocities[], float dt){
     float my = 0.01; // True friction for trans is 0.2
     float friction = my*g*dt;
     const float EPS = 1e-5;
-
+    float friction_x;
+    float friction_y;
     for(int i = 0; i < 16; i++){
 
-        float friction_x = abs(friction*cos(atan(ballVelocities[i].y/(ballVelocities[i].x+EPS))));
-        float friction_y = abs(friction*sin(atan(ballVelocities[i].y/(ballVelocities[i].x+EPS))));
+        friction_x = friction*cos(abs(atan(ballVelocities[i].y/(ballVelocities[i].x+EPS))));
+        friction_y = friction*sin(abs(atan(ballVelocities[i].y/(ballVelocities[i].x+EPS))));
 
-        if(ballVelocities[i].x > EPS){
+        if(ballVelocities[i].x > 0.0f){
             ballVelocities[i].x = std::max(ballVelocities[i].x-friction_x, 0.0f);
+            //ballVelocities[i].x = ballVelocities[i].x-friction_x;
         }
-        if(ballVelocities[i].x < -EPS){
+        else if(ballVelocities[i].x < 0.0f){
             ballVelocities[i].x = std::min(ballVelocities[i].x+friction_x, 0.0f);
+            //ballVelocities[i].x = ballVelocities[i].x+friction_x;
         }
-        if(ballVelocities[i].y > EPS){
+        if(ballVelocities[i].y > 0.0f){
             ballVelocities[i].y = std::max(ballVelocities[i].y-friction_y, 0.0f);
+            //ballVelocities[i].y = ballVelocities[i].y-friction_y;
         }
-        if(ballVelocities[i].y < -EPS){
+        else if(ballVelocities[i].y < 0.0f){
             ballVelocities[i].y = std::min(ballVelocities[i].y+friction_y, 0.0f);
+            //ballVelocities[i].y = ballVelocities[i].y+friction_y;
         }
     }
+    //std::cout << "x: " << ballVelocities[0].x << " y: " << ballVelocities[0].y << std::endl;
 }
