@@ -1,11 +1,3 @@
-//Keep at it on frictional forces, balls accelerate for some reason,
-//most likely due to a wrong sign
-
-//Overlapping balls, the parameter n needs to change to an actual overlap
-
-//Try creating multiple balls as different objects, as for the textures
-
-
 /*
  * A C++ framework for OpenGL programming in TNM046 for MT1 2014.
  *
@@ -215,9 +207,9 @@ int main(int argc, char *argv[]) {
 
     glfwSwapInterval(0); // Do not wait for screen refresh between frames
 
-     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-     glEnable(GL_CULL_FACE);
-     glEnable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
     myShape.printInfo();
     poolTable.printInfo();
@@ -240,7 +232,6 @@ int main(int argc, char *argv[]) {
 		// Set the clear color and depth, and clear the buffers for drawing
         glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
         //Interaction, Camera
         myMouseRotator.poll(window);
@@ -367,11 +358,6 @@ void updateAndRender(float x, float y, float angle, float rot){
     Utilities::mat4mult(Trot_y, Trot_z, Trot);
     Utilities::mat4mult(Trot_z_i, Trot, Trot);
 
-    /*Utilities::mat4rotx(Trot_z, -y_vel);
-    Utilities::mat4roty(Trot_y, -x_vel);
-    Utilities::mat4mult(Trot_z, Trot_y, Trot);*/
-    //Utilities::mat4rotaxis(Trot, rot, x_vel, y_vel);
-
     Utilities::mat4translate(T, x, y, 0.0f);
     Utilities::mat4mult(T, Trot, T);
     glUniformMatrix4fv(location_T, 1, GL_FALSE, T);
@@ -447,8 +433,6 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
             // Check for collision
             if(norm  <= d){
 
-                //float n_x = d - abs((ballPos[i].x-ballPos[j].x));
-                //float n_y = d - abs((ballPos[i].y-ballPos[j].y));
                 temp = ballPos[i] - ballPos[j];
                 float length = sqrt(pow(temp.x,2) + pow(temp.y,2));
 
@@ -459,25 +443,6 @@ void ballToBallCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
                 // Update velocities
                 ballVel[i] = ballVel[i] - C1*(ballPos[i] - ballPos[j]);
                 ballVel[j] = ballVel[j] - C2*(ballPos[j] - ballPos[i]);
-
-                // Move balls before computing new velocity to prevent overlap
-                /*if((ballPos[i].x > ballPos[j].x )&& (n_x > 0.0f)){
-                    ballPos[i].x += n_x/2;
-                    ballPos[j].x -= n_x/2;
-                }
-                else if((ballPos[i].x < ballPos[j].x )&& (n_x > 0.0f)){
-                    ballPos[i].x -= n_x/2;
-                    ballPos[j].x += n_x/2;
-                }
-
-                if((ballPos[i].y > ballPos[j].y )&& (n_y > 0.0f)){
-                    ballPos[i].y += n_y/2;
-                    ballPos[j].y -= n_y/2;
-                }
-                else if((ballPos[i].y < ballPos[j].y )&& (n_y > 0.0f)){
-                    ballPos[i].y -= n_y/2;
-                    ballPos[j].y += n_y/2;
-                }*/
             }
         }
     }
@@ -496,8 +461,6 @@ void ballToBorderCollision(glm::vec2 ballPos[], glm::vec2 ballVel[]){
     float yMinLengthTable = 0+0.19;//+(1.065/2);
 
     for(int i = 0; i < 16; i++){
-        // Ball properties, r = radius;
-        //float r = 0.0286;
 
         // Check if particles collided with the walls horizontally (x-direction)
         if(ballPos[i].x + r >= xMaxLengthTable - sep){
@@ -551,5 +514,4 @@ void updateTransFriction(glm::vec2 ballVelocities[], float dt){
             //ballVelocities[i].y = ballVelocities[i].y+friction_y;
         }
     }
-    //std::cout << "x: " << ballVelocities[0].x << " y: " << ballVelocities[0].y << std::endl;
 }

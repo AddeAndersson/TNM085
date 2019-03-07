@@ -185,7 +185,6 @@ void Utilities::printError(const char *errtype, const char *errmsg) {
   fprintf(stderr, "%s: %s\n", errtype, errmsg);
 }
 
-
 /*
  * loadExtensions() - Load OpenGL extensions for anything above OpenGL
  * version 1.1. (This is a requirement only on Windows, so on other
