@@ -17,4 +17,4 @@ How to run the program under Windows using OpenGL and GLFW. Please follow the in
 6. Open the file named ”GLPrimer”, build and run the program. 
 7. Press 'A' to start.
 
-8. To start the simulation, press “A” to make the cue ball move.
+8. To start the simulation, press “A” to make the cue ball move. To move the camera, use "C", "Space" and the arrows.
