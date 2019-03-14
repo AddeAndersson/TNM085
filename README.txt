@@ -1,3 +1,7 @@
+
+
+
+
 How to run the program under Windows using OpenGL and GLFW. Please follow the instructions below exactly. All the steps are required. If you just want to see the simulation, use the GLprimer.exe.
 
 1. Start Code::Blocks.
@@ -13,4 +17,4 @@ How to run the program under Windows using OpenGL and GLFW. Please follow the in
 6. Open the file named ”GLPrimer”, build and run the program. 
 7. Press 'A' to start.
 
-7. To start the simulation, press “A” to make the cue ball move.
+8. To start the simulation, press “A” to make the cue ball move.
